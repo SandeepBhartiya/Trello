@@ -1,10 +1,13 @@
 import { signupSchema,signinSchema } from "../validation";
+import {Resend} from "resend";
 import { prisma } from "db/client";
 import bcrypt from "bcrypt";
+import { signToken } from "../middleware/utils";
 
-export const signUp=async({username,email,password})=>{
+const resend=new Resend(process.env.RESEND_API_KEY);
+
+export const signUp=async(username:string,email:string,password:string)=>{
     try{
-        console.log("Data",username,email,password);
         const validSignUp=signupSchema.safeParse({username:username,email:email,password:password});
         console.log("Validation",validSignUp);
         if(!validSignUp.success)
@@ -31,6 +34,7 @@ export const signUp=async({username,email,password})=>{
             password:hashPassword,
            },
         });
+        await sendNotification(email,"Welcome to Trello",`<h1>Welcome to Trello</h1><p>Hi ${username}, you have successfully signed up on Trello</p>`);
         return user;
     }catch(err){
         console.log(err);
@@ -38,7 +42,7 @@ export const signUp=async({username,email,password})=>{
     }
 }
 
-export const signIn=async({email,password})=>{
+export const signIn=async(email:string,password:string)=>{
     try{
         const validSignIn=signinSchema.safeParse({email:email,password:password});
         if(!validSignIn.success)
@@ -62,13 +66,28 @@ export const signIn=async({email,password})=>{
                 message:"Invalid password"
             }
         }
+        const token=signToken({userId:userExists.id});
         return({
             id:userExists.id,
             username:userExists.username,
-            email:userExists.email
+            email:userExists.email,
+            token:token
         });
     }catch(err){
         console.log(err);
         return err;
+    }
+}
+
+export const sendNotification=async(to:string,subject:string,html:string)=>{
+    try{
+        return await resend.emails.send({
+            from:'Trello App <onboarding@resend.dev>',
+            to,
+            subject,
+            html,
+        });
+    }catch(err){
+        console.error(err);
     }
 }
