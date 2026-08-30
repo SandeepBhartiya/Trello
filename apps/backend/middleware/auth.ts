@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";  
 import { TokenPayload } from "./utils";
 import jwt from "jsonwebtoken";
-const JWT_SECRET_KEY=process.env.JWT_SECRET!;
 export const authMiddleWare=async(req:Request,res:Response,next:NextFunction)=>{
     try{
         req.body = req.body || {};
@@ -11,7 +10,11 @@ export const authMiddleWare=async(req:Request,res:Response,next:NextFunction)=>{
         {
             return res.status(401).send("No Token Provided");
         }
-        const decoded=jwt.verify(token,process.env.JWT_SECRET) as TokenPayload;
+        const secret=process.env.JWT_SECRET;
+        if(!secret){
+            throw new Error("JWT_SECRET is not defined");
+        }
+        const decoded=jwt.verify(token,secret) as TokenPayload;
         req.body.userId=decoded.userId;
         next();
     }catch(err){

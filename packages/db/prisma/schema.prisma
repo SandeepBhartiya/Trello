@@ -28,6 +28,7 @@ model Org {
   description String?
   memberships Membership[]
   boards      Board[]
+  invites     Invite[]
 }
 
 model Membership {
@@ -38,6 +39,17 @@ model Membership {
   accepted Boolean @default(false)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   org  Org  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+}
+
+model Invite {
+  id        Int      @id @default(autoincrement())
+  email     String
+  orgId     String
+  status    String   @default("pending") // "pending" | "accepted"
+  invitedBy Int
+  createdAt DateTime @default(now())
+  org       Org      @relation(fields: [orgId], references: [id])
+  @@unique([email, orgId])
 }
 
 model Board {

@@ -1,73 +1,51 @@
-import { prisma }  from "db/client";
+import {Router} from "express";
+import { authMiddleWare } from "../middleware/auth";
+import { checkOrgAccess } from "../middleware/checkOrgAccess";
+import { createOrg, deleteOrg, getOrg } from "../services/organization";
 
-export const createOrg=async(userId:string,name:string,description:string)=>{
-    if(!name){
-        return{
-            error:true,
-            message:"Organization name is required"
-        }
-    }
-    try{
-        const orgExists=await prisma.org.findUnique({where:{name:name}});
-        if(orgExists){
-            return{
-                error:true,
-                message:"Organization already exists"
-            }
-        }
-        const org=await prisma.$transaction(async(tx)=>{
-            const newOrg=await tx.org.create({data:{name:name,description:description}});
-            await tx.membership.create({data:{userId,orgId:newOrg.id,role:"admin"}});
-            return newOrg;
-        });
-        return org;
-    }catch(err){
-        console.log(err);
-        return err;
-    }
-}
+const router=Router();
 
-export const getOrg=async(userId:string)=>{
+router.post("/",authMiddleWare,async(req,res)=>{
     try{
-        const membership=await prisma.membership.findMany({where:{userId:userId},include:{org:true}});
-        const orgs=membership.map((m)=>({
-            ...m.org,
-            role:m.role
-        }));
-        return orgs;
-    }catch(err){
-        console.log(err);
-        return err;
-    }
-}
-export const deleteOrg=async(id:string)=>{
-    try{
-        const boardCount = await prisma.board.count({
-        where: { organizationId: id },
-      });
-      if (boardCount > 0) {
-        return {
-            error: true,
-            message: "Delete all boards before deleting the organization"
-        } 
-      }
-      console.log("1");
-        const orgExists=await prisma.org.findUnique({where:{id:id}});
-        console.log("2");
-        if(!orgExists){
-            return{
-                error:true,
-                message:"Organization does not exists"
-            }
+        const {userId,name,description}=req.body;
+        const organization:any=await createOrg(userId,name,description);
+        if(organization?.error){
+            return res.status(500).send(organization?.message);
         }
-        console.log("orgExists",orgExists);
-        await prisma.$transaction(async(tx)=>{
-            await tx.membership.deleteMany({where:{orgId:id}});
-            await tx.org.delete({where:{id:id}});
-        });
-        return;
+        return res.status(201).send(organization);
     }catch(err){
-        console.log(err);
-        return err;
+        return res.status(500).send(err);
     }
-}
+});
+
+router.get("/",authMiddleWare,async(req,res)=>{
+    try{
+        const userId=req.body.userId;
+        const organizations:any=await getOrg(userId);
+        if(organizations?.error){
+            return res.status(500).send(organizations?.message);
+        }
+        if(organizations?.length>0){
+            return res.status(200).send(organizations);
+        }else{
+            return res.status(200).send("User is not part of any organizations");
+        }
+    }catch(err){
+        return res.status(500).send("Failed to fetch organizations");
+    }
+});
+
+router.delete("/:id",authMiddleWare,checkOrgAccess("admin"),async(req,res)=>{
+    try{
+        const {id}=req.params as {id:string};
+        const deletedOrg:any=await deleteOrg(id);
+        if(deletedOrg?.error){
+            return res.status(500).send(deletedOrg?.message);
+        }
+        return res.status(200).send(deletedOrg);
+    }catch(err){
+        return res.status(500).send("Failed to delete organizations");
+    }
+});
+
+export default router;

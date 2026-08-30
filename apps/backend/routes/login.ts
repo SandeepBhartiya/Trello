@@ -1,93 +1,35 @@
-import { signupSchema,signinSchema } from "../validation";
-import {Resend} from "resend";
-import { prisma } from "db/client";
-import bcrypt from "bcrypt";
-import { signToken } from "../middleware/utils";
+import { signUp,signIn } from "../services/login";
+import {Router} from "express";
+const router=Router();
 
-const resend=new Resend(process.env.RESEND_API_KEY);
-
-export const signUp=async(username:string,email:string,password:string)=>{
+router.post("/signup",async(req,res)=>{
     try{
-        const validSignUp=signupSchema.safeParse({username:username,email:email,password:password});
-        console.log("Validation",validSignUp);
-        if(!validSignUp.success)
-        {
-            console.log(validSignUp.error.flatten().fieldErrors);
-           return {
-                error: true,
-                message: validSignUp.error.flatten().fieldErrors,
-            };
+        const {username,email,password}=req.body;
+        const signup:any=await signUp(username,email,password);
+        if(signup?.error){
+           return res.status(500).send(signup?.message);
         }
-        const userExists=await prisma.user.findUnique({where:{email:email}});
-        console.log("userExists",userExists);
-        if(userExists){
-            return {
-                error: true,
-                message: "User already exists",
-            };
-        }
-        const hashPassword=await bcrypt.hash(password,10);
-        const user=await prisma.user.create({
-           data:{
-            username:username,
-            email:email,
-            password:hashPassword,
-           },
-        });
-        await sendNotification(email,"Welcome to Trello",`<h1>Welcome to Trello</h1><p>Hi ${username}, you have successfully signed up on Trello</p>`);
-        return user;
-    }catch(err){
+        return res.status(201).send(signup);
+    }catch(err)
+    {
         console.log(err);
-        return err;
+        return res.status(500).send(err);
     }
-}
+});
 
-export const signIn=async(email:string,password:string)=>{
-    try{
-        const validSignIn=signinSchema.safeParse({email:email,password:password});
-        if(!validSignIn.success)
-        {
-            return {
-                error: true,
-                message: validSignIn.error.flatten().fieldErrors,
-            };
-        }
-        const userExists=await prisma.user.findUnique({where:{email:email}});
-        if(!userExists){
-             return {
-                error: true,
-                message: "User does not exists",
-            };
-        }
-        const validPassword=await bcrypt.compare(password,userExists.password);
-        if(!validPassword){
-            return {
-                error:true,
-                message:"Invalid password"
-            }
-        }
-        const token=signToken({userId:userExists.id});
-        return({
-            id:userExists.id,
-            username:userExists.username,
-            email:userExists.email,
-            token:token
-        });
-    }catch(err){
-        console.log(err);
-        return err;
+router.get("/signin",async(req,res)=>{
+    try {
+       const {email,password}=req.body;
+       const signin:any=await signIn(email,password);
+       if(signin?.error){
+        return res.status(500).send(signin?.message);
+       }
+        //localStorage.setItem("token",signin?.token);  //write this code in frontend to store token
+       return res.status(201).send(signin);
+        
+    } catch (err) {
+        return res.status(500).send(err);
     }
-}
+});
 
-export const sendNotification=async(to:string,subject:string,html:string)=>{
-    try{
-        return await resend.emails.send({
-            from:'Trello App <onboarding@resend.dev>',
-            to,
-            subject,
-            html,
-        });
-    }catch(err){
-        console.error(err);
-    }
-}
+export default router;
