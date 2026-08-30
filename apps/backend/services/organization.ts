@@ -1,6 +1,6 @@
 import { prisma }  from "db/client";
 
-export const createOrg=async(userId:string,name:string,description:string)=>{
+export const createOrg=async(userId:number,name:string,description:string)=>{
     if(!name){
         return{
             error:true,
@@ -27,7 +27,7 @@ export const createOrg=async(userId:string,name:string,description:string)=>{
     }
 }
 
-export const getOrg=async(userId:string)=>{
+export const getOrg=async(userId:number)=>{
     try{
         const membership=await prisma.membership.findMany({where:{userId:userId},include:{org:true}});
         const orgs=membership.map((m)=>({
@@ -40,7 +40,7 @@ export const getOrg=async(userId:string)=>{
         return err;
     }
 }
-export const deleteOrg=async(id:string)=>{
+export const deleteOrg=async(id:number)=>{
     try{
         const boardCount = await prisma.board.count({
         where: { organizationId: id },

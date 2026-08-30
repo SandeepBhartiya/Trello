@@ -13,17 +13,18 @@ datasource db {
 }
 
 model User {
-  id             String          @id @default(uuid())
+  id             Int          @id @default(autoincrement())
   email          String          @unique
   username       String
   password       String
   memberships    Membership[]
   issuesMapping  IssuesMapping[]
   comments       Comment[]
+  invitesSent    Invite[]
 }
 
 model Org {
-  id          String       @id @default(uuid())
+  id          Int       @id @default(autoincrement())
   name        String       @unique
   description String?
   memberships Membership[]
@@ -32,49 +33,51 @@ model Org {
 }
 
 model Membership {
-  id     String @id @default(uuid())
-  userId String
-  orgId  String
+  id     Int @id @default(autoincrement())
+  userId Int
+  orgId  Int
   role   String
   accepted Boolean @default(false)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   org  Org  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  @@unique([userId,orgId])
 }
 
 model Invite {
   id        Int      @id @default(autoincrement())
   email     String
-  orgId     String
+  orgId     Int
   status    String   @default("pending") // "pending" | "accepted"
   invitedBy Int
   createdAt DateTime @default(now())
   org       Org      @relation(fields: [orgId], references: [id])
+  inviter   User     @relation(fields:[invitedBy],references:[id],onDelete:Cascade)
   @@unique([email, orgId])
 }
 
 model Board {
-  id             String    @id @default(uuid())
+  id             Int    @id @default(autoincrement())
   title          String
-  organizationId String
+  organizationId Int
   org      Org       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   sections Section[]
   issues   Issue[]
 }
 
 model Section {
-  id      String  @id @default(uuid())
+  id      Int  @id @default(autoincrement())
   title   String
-  boardId String
+  boardId Int
   board  Board   @relation(fields: [boardId], references: [id], onDelete: Cascade)
   issues Issue[]
 }
 
 model Issue {
-  id          String   @id @default(uuid())
+  id          Int   @id @default(autoincrement())
   title       String
   description String?
-  boardId     String
-  sectionId   String
+  boardId     Int
+  sectionId   Int
   board         Board           @relation(fields: [boardId], references: [id], onDelete: Cascade)
   section       Section         @relation(fields: [sectionId], references: [id], onDelete: Cascade)
   issuesMapping IssuesMapping[]
@@ -82,18 +85,19 @@ model Issue {
 }
 
 model IssuesMapping {
-  id      String @id @default(uuid())
-  userId  String
-  issueId String
+  id      Int @id @default(autoincrement())
+  userId  Int
+  issueId Int
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   issue Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  @@unique([userId,issueId])
 }
 
 model Comment {
-  id      String @id @default(uuid())
+  id      Int @id @default(autoincrement())
   content String
-  issueId String
-  userId  String
+  issueId Int
+  userId  Int
   issue Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

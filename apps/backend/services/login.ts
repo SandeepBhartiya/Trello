@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import { signToken } from "../middleware/utils";
 import {sendNotification} from "../utils/email";
 
-export const signUp=async(username:string,email:string,password:string)=>{
+export const signUp=async(username:number,email:string,password:string)=>{
     try{
         const validSignUp=signupSchema.safeParse({username:username,email:email,password:password});
         if(!validSignUp.success)

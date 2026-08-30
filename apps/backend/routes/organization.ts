@@ -37,7 +37,7 @@ router.get("/",authMiddleWare,async(req,res)=>{
 
 router.delete("/:id",authMiddleWare,checkOrgAccess("admin"),async(req,res)=>{
     try{
-        const {id}=req.params as {id:string};
+        const id:number=Number(req.params.id);
         const deletedOrg:any=await deleteOrg(id);
         if(deletedOrg?.error){
             return res.status(500).send(deletedOrg?.message);

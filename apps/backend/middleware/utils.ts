@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 
 
 export interface TokenPayload{
-    userId:string
+    userId:number
 }
 export const signToken=(payload:TokenPayload)=>{
     const secret=process.env.JWT_SECRET;

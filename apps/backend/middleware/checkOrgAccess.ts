@@ -8,21 +8,23 @@ const roleRank:Record<orgRole,number>={
 export const checkOrgAccess=(minRole:orgRole="member")=>{
     return async(req:Request,res:Response,next:NextFunction)=>{
         try{
-            const userId=req.body.userId as number;
-            const orgId=(req.params.id || req.body.orgid) as string;
-            if(!orgId){
+            const rawUserId=req.body.userId as number;
+            const rawOrgId=req.params.id || req.body.orgid;
+            if(!rawOrgId){
                 return res.status(400).send("OrgId is required");
             }
+            const orgId=Number(rawOrgId);
+            const userId=Number(rawUserId);
             const membership=await prisma.membership.findFirst({
                 where:{
-                    orgId,
-                    userId
+                    orgId:orgId,
+                    userId:userId
                 },
             });
             const role = membership?.role;
             if (role !== "member" && role !== "admin") {
-            return res.status(403).send("Invalid role");
-}
+                return res.status(403).send("Invalid role");
+            }
             if(!membership){
                 return res.status(500).send("You are not a member of this organization");
             }
