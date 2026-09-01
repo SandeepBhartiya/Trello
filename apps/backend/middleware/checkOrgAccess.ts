@@ -22,6 +22,7 @@ export const checkOrgAccess=(minRole:orgRole="member")=>{
                 },
             });
             const role = membership?.role;
+            console.log("role",role,"mebership",membership);
             if (role !== "member" && role !== "admin") {
                 return res.status(403).send("Invalid role");
             }
