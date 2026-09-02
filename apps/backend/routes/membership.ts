@@ -2,13 +2,14 @@ import { Router } from "express";
 import { authMiddleWare } from "../middleware/auth";
 import { checkOrgAccess } from "../middleware/checkOrgAccess";
 import { createInvite,acceptInvite,removeMembership } from "../services/invite";
+import { fromBody } from "../middleware/resolver";
 
 const router=Router();
 
-router.post("/invite",authMiddleWare,checkOrgAccess("admin"),async(req,res)=>{
+router.post("/invite",authMiddleWare,checkOrgAccess("admin",fromBody),async(req,res)=>{
     try{
-        const {userId,email,orgid}=req.body;
-        const result:any=await createInvite(userId,orgid,email);
+        const {userId,email,orgId}=req.body;
+        const result:any=await createInvite(userId,orgId,email);
         if(result?.error){
             return res.status(400).send(result?.message);
         }

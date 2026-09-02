@@ -1,20 +1,19 @@
 import { Request,Response,NextFunction } from "express";
 import {prisma} from "db/client";
 type orgRole="member"|"admin";
+type orgResolver=(req:Request)=>Promise<number|string|null>;
 const roleRank:Record<orgRole,number>={
     member:1,
     admin:2
 }
-export const checkOrgAccess=(minRole:orgRole="member")=>{
+export const checkOrgAccess=(minRole:orgRole="member",resolveOrgId:orgResolver)=>{
     return async(req:Request,res:Response,next:NextFunction)=>{
         try{
-            const rawUserId=req.body.userId as number;
-            const rawOrgId=req.params.id || req.body.orgid;
-            if(!rawOrgId){
+            const orgId=await resolveOrgId(req) as number;
+            if(!orgId){
                 return res.status(400).send("OrgId is required");
             }
-            const orgId=Number(rawOrgId);
-            const userId=Number(rawUserId);
+            const userId=req.body.userId as number;
             const membership=await prisma.membership.findFirst({
                 where:{
                     orgId:orgId,
@@ -22,7 +21,6 @@ export const checkOrgAccess=(minRole:orgRole="member")=>{
                 },
             });
             const role = membership?.role;
-            console.log("role",role,"mebership",membership);
             if (role !== "member" && role !== "admin") {
                 return res.status(403).send("Invalid role");
             }

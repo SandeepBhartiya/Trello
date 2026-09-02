@@ -35,7 +35,7 @@ router.get("/",authMiddleWare,async(req,res)=>{
     }
 });
 
-router.delete("/:id",authMiddleWare,checkOrgAccess("admin"),async(req,res)=>{
+router.delete("/:id",authMiddleWare,checkOrgAccess("admin",async(req)=>Number(req.params.id)),async(req,res)=>{
     try{
         const id:number=Number(req.params.id);
         const deletedOrg:any=await deleteOrg(id);
