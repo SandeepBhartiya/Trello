@@ -4,7 +4,6 @@ import  { checkOrgAccess } from "../middleware/checkOrgAccess";
 import {createBoard,getBoards,updateBoards,deleteBoard} from "../services/boards";
 import { fromBoardId, fromBody } from "../middleware/resolver";
 const router=Router();
-
 router.post("/",authMiddleWare,checkOrgAccess("member",fromBody),async(req,res)=>{
     try{
         console.log("Cup",req.body);
@@ -22,9 +21,10 @@ router.post("/",authMiddleWare,checkOrgAccess("member",fromBody),async(req,res)=
 
 router.get("/",authMiddleWare,checkOrgAccess("member",fromBody),async(req,res)=>{
     try{
-        console.log(req.body);
-        const organizationId=req.body.orgid;
-        console.log(organizationId);
+        const organizationId=req.body.orgId ?? null;
+        if(!organizationId){
+            return res.status(400).send("organizationId is required");
+        }
         const boards:any=await getBoards(organizationId);
         if(boards?.error){
             return res.status(400).send(boards?.message);

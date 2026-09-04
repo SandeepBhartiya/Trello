@@ -35,5 +35,4 @@ export const checkOrgAccess=(minRole:orgRole="member",resolveOrgId:orgResolver)=
             return res.status(500).send("Failed to check organization access");
         }
     }
-
 }
