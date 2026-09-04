@@ -11,3 +11,12 @@ export const fromBoardId=async(req:Request)=>{
     const board=await prisma.board.findUnique({where:{id:Number(boardId)}});
     return board?.organizationId??null;
 }
+
+export const fromSectionId=async(req:Request)=>{
+    const sectionId=req.params.id || req.body.sectionId;
+    if(!sectionId){
+        return null;
+    }
+    const section=await prisma.section.findUnique({where:{id:Number(sectionId)},include:{board:true}});
+    return section?.board.organizationId??null;
+}
