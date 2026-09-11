@@ -33,7 +33,7 @@ router.post("/accept",authMiddleWare,async(req,res)=>{
     }
 });
 
-router.delete("/membership",authMiddleWare,async(req,res)=>{
+router.delete("/membership",authMiddleWare,async(req,res)=>{//i think admin can remove member
     try{
         const {userId,targetUserId,orgId}=req.body;
         const result=await removeMembership(Number(userId),Number(targetUserId),Number(orgId));
