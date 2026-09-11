@@ -7,7 +7,7 @@ router.post("/signup",async(req,res)=>{
         const {username,email,password}=req.body;
         const signup:any=await signUp(username,email,password);
         if(signup?.error){
-           return res.status(500).send(signup?.message);
+           return res.status(400).send(signup?.message);
         }
         return res.status(201).send(signup);
     }catch(err)
@@ -24,7 +24,6 @@ router.post("/signin",async(req,res)=>{
        if(signin?.error){
         return res.status(500).send(signin?.message);
        }
-        //localStorage.setItem("token",signin?.token);  //write this code in frontend to store token
        return res.status(201).send(signin);
         
     } catch (err) {

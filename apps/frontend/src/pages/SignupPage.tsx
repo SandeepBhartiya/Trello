@@ -1,8 +1,10 @@
 import {useState} from "react";
 import {useNavigate,Link} from "react-router";
+import {ToastContainer, toast} from "react-toastify";
 import { signup } from "../api/auth";
 import {useAuth} from "../context/AuthContext";
 import{validators,runValidation,type FieldErrors} from "../utils/validation";
+import "react-toastify/dist/ReactToastify.css";
 import "../styles/auth.css";
 
 type SignupField="email" | "username" | "password";
@@ -31,10 +33,11 @@ export default function SignupPage() {
         setLoading(true);
         try{
             const {user,token}=await signup(email,username,password);
+            toast.success("Signed up successfully");
             login(user,token);
             navigate("/");
         }catch(err:any){
-            setFieldErrors(err.message || "SignUp Failed");
+            toast.error(err.message || "SignUp Failed");
         }finally{
             setLoading(false);
         }
@@ -42,6 +45,7 @@ export default function SignupPage() {
     return (
         <div className="auth-page">
             <div className="auth-card">
+                <ToastContainer position="top-right" autoClose={4000} />
                 <h1>Sign up</h1>
                 {formError && <div className="form-error">{formError}</div>}
                 <form onSubmit={handelSubmit} noValidate>

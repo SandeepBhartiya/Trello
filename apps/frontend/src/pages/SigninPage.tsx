@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router";
+import {ToastContainer, toast} from "react-toastify";
 import { signin } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
 import{validators,runValidation,type FieldErrors} from "../utils/validation";
+import "react-toastify/dist/ReactToastify.css";
 import "../styles/auth.css";
 
 type SigninField = "email" | "password";
@@ -29,12 +31,12 @@ export  default function SigninPage(){
         if(Object.keys(errors).length>0)return;
         setLoading(true);
         try{
-            console.log("inside signin without clicking it");
             const {user,token}=await signin(email,password);
+            toast.success("Signed in successfully");
             login(user,token);
             navigate("/organizations");
         }catch(err:any){
-            setFieldErrors(err.message || "SignIn Failed");
+            toast.error(err.message || "SignIn Failed");
         }finally{
             setLoading(false);
         }
@@ -43,6 +45,7 @@ export  default function SigninPage(){
     return(
         <div className="auth-page">
             <div className="auth-card">
+                <ToastContainer position="top-right" autoClose={4000} />
                 <h1>Sign in</h1>
 
                 {formError && <div className="form-error">{formError}</div>}
