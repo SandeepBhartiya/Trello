@@ -1,0 +1,148 @@
+.org-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+
+.org-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.org-page-header h1 {
+  font-size: 24px;
+  margin: 0;
+}
+
+.org-create-btn {
+  padding: 9px 16px;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.org-create-btn:hover {
+  background: #4f46e5;
+}
+
+.org-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.org-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.org-card:hover {
+  border-color: var(--color-primary);
+}
+
+.org-card-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.org-card-desc {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+.org-card-role {
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: #2a2a30;
+  color: var(--color-text-muted);
+  text-transform: capitalize;
+}
+
+.org-empty {
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: 48px 0;
+}
+
+.org-loading,
+.org-error {
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: 48px 0;
+}
+
+.org-error {
+  color: var(--color-error);
+}
+
+/* modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal-card {
+  background: var(--color-card-bg);
+  border-radius: var(--radius-md);
+  padding: 28px;
+  width: 100%;
+  max-width: 380px;
+}
+
+.modal-card h2 {
+  margin: 0 0 20px;
+  font-size: 18px;
+  color: var(--color-text);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.modal-actions button {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+}
+
+.modal-cancel {
+  background: #2a2a30;
+  color: var(--color-text);
+}
+
+.modal-submit {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.modal-submit:disabled {
+  background: var(--color-primary-light);
+  cursor: not-allowed;
+}

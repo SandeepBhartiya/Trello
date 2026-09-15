@@ -20,6 +20,7 @@ export const validators={
         if(value.length<6)return "Password must be at least 6 characters";
         return null;
     },
+    minLength:(value:string,minLength:number):string|null=>value.length<minLength?`Password must be at least ${minLength} characters`:null
 };
 
 export function runValidation<T extends string>(

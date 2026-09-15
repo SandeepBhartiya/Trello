@@ -54,6 +54,7 @@ export const signIn=async(email:string,password:string)=>{
                 message: "User does not exists",
             };
         }
+        console.log("userExists",userExists);
         const validPassword=await bcrypt.compare(password,userExists.password);
         if(!validPassword){
             return {
@@ -62,6 +63,7 @@ export const signIn=async(email:string,password:string)=>{
             }
         }
         const token=signToken({userId:userExists.id});
+        console.log("token",token);
         return({
             id:userExists.id,
             username:userExists.username,

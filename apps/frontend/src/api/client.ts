@@ -7,7 +7,9 @@ type RequestOptions={
 
 export async function apiClient<T>(path:string,option:RequestOptions={}):Promise<T>{
     const token=localStorage.getItem("token");
-
+    console.log("token",token);
+    console.log("path",path);
+    console.log("option",option);
     const res=await fetch(`${BASE_URL}${path}`,{
         method:option.method || "GET",
         headers:{
@@ -16,7 +18,9 @@ export async function apiClient<T>(path:string,option:RequestOptions={}):Promise
         },
         body:option.body?JSON.stringify(option.body):undefined,
     });
-    
+    console.log("resBODY",res.body);
+    console.log("resOK",res.ok);
+    // console.log("resTEXT",await res.text());
     if(!res.ok){
         const responseText = await res.text();
         let errorMessage = `Request failed: ${res.status}`;
@@ -31,5 +35,7 @@ export async function apiClient<T>(path:string,option:RequestOptions={}):Promise
         throw new Error(errorMessage);
     }
     const text=await res.text();
+    console.log("text",text);
+    console.log("JSON.parse(text)",JSON.parse(text));
     return text?JSON.parse(text):(undefined as T);
 }
