@@ -2,8 +2,9 @@ import { BrowserRouter,Routes,Route,Navigate } from "react-router";
 import {AuthProvider} from "./context/AuthContext";
 import SignupPage from "./pages/SignupPage";
 import SigninPage from "./pages/SigninPage";
-import ProtectedRoute from "./component/ProtectedRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
 import OrgListPage from "./pages/OrgListPage";
+import BoardListPage from "./pages/BoardListPage";
 export default function App(){
   return(
     <AuthProvider>
@@ -13,10 +14,15 @@ export default function App(){
           <Route path="/signin" element={<SigninPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/organizations" element={
-            // <ProtectedRoute>
-            // </ProtectedRoute>
+            <ProtectedRoute>
               <OrgListPage/>
+            </ProtectedRoute>
           } />
+          <Route path="/organizations/:orgId/boards" element={
+            <ProtectedRoute>
+              <BoardListPage/>
+            </ProtectedRoute>
+          }/>
         </Routes>
       </BrowserRouter>
     </AuthProvider>

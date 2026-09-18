@@ -31,12 +31,9 @@ export  default function SigninPage(){
         if(Object.keys(errors).length>0)return;
         setLoading(true);
         try{
-            console.log("------Inside Process------",email,password);
             const data:any=await signin(email,password);
-            console.log("Inside Process",data?.username,data?.token);
             toast.success("Signed in successfully");
-            login(data?.username,data?.token);
-            //work fine till this part show erro while calling orgs 
+            login(data?.username,data?.token); 
             navigate("/organizations");
         }catch(err:any){
             toast.error(err.message || "SignIn Failed");

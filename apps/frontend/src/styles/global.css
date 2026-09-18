@@ -4,6 +4,7 @@
 
 body {
   margin: 0;
+  width: 100%;
   font-family: var(--font-family);
   color: var(--color-text);
   background: #ffffff;   /* hardcoded fallback — matches --color-bg */

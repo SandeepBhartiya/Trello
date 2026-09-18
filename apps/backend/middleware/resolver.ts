@@ -2,7 +2,8 @@ import {prisma} from  "db/client";
 import {Request} from "express";
 
 export const fromBody=async(req:Request)=>req.body.organizationId??req.body.orgId;
-
+export const fromParams=async(req:Request)=>req.params.organizationId??req.params.orgId;
+export const fromQuery:any=async(req:Request)=>req.query.organizationId??req.query.orgId;
 export const fromBoardId=async(req:Request)=>{
     const boardId=req.params.id || req.body.boardId;
     if(!boardId){

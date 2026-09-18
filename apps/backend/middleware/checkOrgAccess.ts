@@ -1,7 +1,7 @@
 import { Request,Response,NextFunction } from "express";
 import {prisma} from "db/client";
 type orgRole="member"|"admin";
-type orgResolver=(req:Request)=>Promise<number|string|null>;
+type orgResolver=(req:Request)=>Promise<number|string|string[]|null>;
 const roleRank:Record<orgRole,number>={
     member:1,
     admin:2

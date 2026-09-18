@@ -2,7 +2,7 @@ import { Router } from "express";
 import { authMiddleWare } from "../middleware/auth";
 import  { checkOrgAccess } from "../middleware/checkOrgAccess";
 import {createBoard,getBoards,updateBoards,deleteBoard} from "../services/boards";
-import { fromBoardId, fromBody } from "../middleware/resolver";
+import { fromBoardId, fromBody, fromParams } from "../middleware/resolver";
 const router=Router();
 router.post("/",authMiddleWare,checkOrgAccess("member",fromBody),async(req,res)=>{
     try{
@@ -19,13 +19,14 @@ router.post("/",authMiddleWare,checkOrgAccess("member",fromBody),async(req,res)=
     }
 });
 
-router.get("/",authMiddleWare,checkOrgAccess("member",fromBody),async(req,res)=>{
+router.get("/",authMiddleWare,checkOrgAccess("member",fromParams),async(req,res)=>{
     try{
-        const organizationId=req.body.orgId ?? null;
+        console.log("Cup",req);
+        const organizationId:any=req.params?.orgId ??req.body.orgId??req.query.orgId;
         if(!organizationId){
             return res.status(400).send("organizationId is required");
         }
-        const boards:any=await getBoards(organizationId);
+        const boards:any=await getBoards(Number(organizationId));
         if(boards?.error){
             return res.status(400).send(boards?.message);
         }

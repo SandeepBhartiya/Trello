@@ -2,7 +2,11 @@ import { useState } from "react";
 import {createOrg} from "../api/organization";
 import { validators,runValidation,type FieldErrors } from "../utils/validation";
 import type { Org } from "../types";
+import { MessageBox } from "./MessageBox";
 import { toast } from "react-toastify";
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+const MySwal = withReactContent(Swal);
 type OrgField="name";
 
 interface Props{
@@ -29,6 +33,7 @@ export default function CreateOrgModal({onClose,onCreated}:Props){
         setLoading(true);
         try{
             const org:any=await createOrg(name,description);
+            MessageBox({title:"Success",message:"Organization created successfully",type:"success"});
             onCreated(org);
             onClose();
         }catch(err:any){
@@ -56,7 +61,7 @@ export default function CreateOrgModal({onClose,onCreated}:Props){
                     </div>
                     <div className="field-group">
                         <label htmlFor="org-description">Description(Optional)</label>
-                        <textarea id="org-description"
+                        <textarea className="org-description"
                             value={description}
                             onChange={(e)=>setDescription(e.target.value)}
                         />

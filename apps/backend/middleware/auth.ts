@@ -5,7 +5,8 @@ export const authMiddleWare=async(req:Request,res:Response,next:NextFunction)=>{
     try{
         req.body = req.body || {};
         // console.log("req.headers",req.headers.authorization,req.headers.authorization?.split(" ")[1]);
-        const token=req.headers.authorization; //can be change if auth is provided in different part of request
+        const authHeader=req.headers.authorization; //can be change if auth is provided in different part of request
+        const token=authHeader?.match(/^Bearer\s+(.+)$/i)?.[1];
         if(!token)
         {
             return res.status(401).send("No Token Provided");
