@@ -4,9 +4,7 @@ import { validators,runValidation,type FieldErrors } from "../utils/validation";
 import type { Org } from "../types";
 import { MessageBox } from "./MessageBox";
 import { toast } from "react-toastify";
-import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
-const MySwal = withReactContent(Swal);
+
 type OrgField="name";
 
 interface Props{

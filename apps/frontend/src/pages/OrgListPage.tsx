@@ -10,7 +10,6 @@ import { MessageBox } from "../components/MessageBox";
 export default function OrgListPage() {
   const [orgs, setOrgs] = useState<Org[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   const navigate = useNavigate();
@@ -21,12 +20,10 @@ export default function OrgListPage() {
 
   const loadOrgs = async () => {
     setLoading(true);
-    setError("");
     try {
       const data:any = await getOrg();
       setOrgs(data??[]);
     } catch (err: any) {
-      // setError(err.message || "Failed to load organizations");
       MessageBox({title:"Error",message:err.message,type:"error"});
     } finally {
       setLoading(false);
@@ -40,13 +37,13 @@ export default function OrgListPage() {
   const handleDeleteOrg = async (orgId: number) => {
     try {
       await deleteOrg(orgId);
+      MessageBox({title:"Success",message:"Organization deleted successfully",type:"success"});
       await loadOrgs();
     } catch (err: any) {
-      setError(err.message || "Failed to delete organization");
+      MessageBox({title:"Error",message:err.message||"Failed to delete organization",type:"error"});
     }
   }
   if (loading) return <div className="org-loading">Loading organizations...</div>;
-  if (error) return <div className="org-error">{error}</div>;
 
   return (
     <div className="org-page">
@@ -106,7 +103,7 @@ export default function OrgListPage() {
       {showCreateModal && (
         <CreateOrgModal
           onClose={() => setShowCreateModal(false)}
-          onCreated={(newOrg) => setOrgs((prev) => [...prev, newOrg])}
+          onCreated={(newOrg) => setOrgs((prev) => [...prev, {...newOrg,role:newOrg.role||"admin"}])}
         />
       )}
     </div>
