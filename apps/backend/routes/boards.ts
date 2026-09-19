@@ -2,11 +2,11 @@ import { Router } from "express";
 import { authMiddleWare } from "../middleware/auth";
 import  { checkOrgAccess } from "../middleware/checkOrgAccess";
 import {createBoard,getBoards,updateBoards,deleteBoard} from "../services/boards";
-import { fromBoardId, fromBody, fromParams } from "../middleware/resolver";
+import { fromBoardId, fromBody, fromQuery } from "../middleware/resolver";
+import { checkMembership } from "../services/membership";
 const router=Router();
 router.post("/",authMiddleWare,checkOrgAccess("member",fromBody),async(req,res)=>{
     try{
-        console.log("Cup",req.body);
         const {orgId,title}=req.body;
         const board:any=await createBoard(title,orgId);
         if(board?.error){
@@ -19,18 +19,19 @@ router.post("/",authMiddleWare,checkOrgAccess("member",fromBody),async(req,res)=
     }
 });
 
-router.get("/",authMiddleWare,checkOrgAccess("member",fromParams),async(req,res)=>{
+router.get("/",authMiddleWare,checkOrgAccess("member",fromQuery),async(req,res)=>{
     try{
-        console.log("Cup",req);
-        const organizationId:any=req.params?.orgId ??req.body.orgId??req.query.orgId;
+        const organizationId:any=req.query.orgId;
+        const userId:any=req.body.userId;
         if(!organizationId){
             return res.status(400).send("organizationId is required");
         }
         const boards:any=await getBoards(Number(organizationId));
+        const role=await checkMembership(Number(userId),Number(organizationId));
         if(boards?.error){
             return res.status(400).send(boards?.message);
         }
-        return res.status(200).send(boards);
+        return res.status(200).send({boards,role});
     }catch(err){
         console.log(err);
         return res.status(500).send("Failed to get boards");
@@ -40,8 +41,7 @@ router.get("/",authMiddleWare,checkOrgAccess("member",fromParams),async(req,res)
 router.put("/:id",authMiddleWare,checkOrgAccess("member",fromBoardId),async(req,res)=>{
     try{
         const {id}=req.params;
-        const {title}=req.body;
-        console.log("title",title,"id",id); 
+        const {title}=req.body; 
         const board:any=await updateBoards(Number(id),title);
         if(board?.error){
             return res.status(400).send(board?.message);

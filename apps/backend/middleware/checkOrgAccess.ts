@@ -16,8 +16,8 @@ export const checkOrgAccess=(minRole:orgRole="member",resolveOrgId:orgResolver)=
             const userId=req.body.userId as number;
             const membership=await prisma.membership.findFirst({
                 where:{
-                    orgId:orgId,
-                    userId:userId
+                    orgId:Number(orgId),
+                    userId:Number(userId)
                 },
             });
             const role = membership?.role;

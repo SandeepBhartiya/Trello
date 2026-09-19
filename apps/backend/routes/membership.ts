@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { authMiddleWare } from "../middleware/auth";
 import { checkOrgAccess } from "../middleware/checkOrgAccess";
-import { createInvite,acceptInvite,removeMembership } from "../services/invite";
+import { createInvite,acceptInvite } from "../services/invite";
+import { removeMembership } from "../services/membership";
 import { fromBody } from "../middleware/resolver";
 
 const router=Router();

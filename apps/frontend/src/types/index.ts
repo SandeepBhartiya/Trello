@@ -30,7 +30,7 @@ export interface Invite{
 
 export interface Board{
     id:number;
-    title: String;
+    title: string;
     organizationId: number;
 }
 
