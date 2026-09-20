@@ -5,6 +5,8 @@ import SigninPage from "./pages/SigninPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import OrgListPage from "./pages/OrgListPage";
 import BoardListPage from "./pages/BoardListPage";
+import KanbanBoardPage from "./pages/KanbanBoardPage";
+
 export default function App(){
   return(
     <AuthProvider>
@@ -22,6 +24,11 @@ export default function App(){
             <ProtectedRoute>
               <BoardListPage/>
             </ProtectedRoute>
+          }/>
+          <Route path="/organizations/:orgId/boards/:boardId/lists" element={
+            <ProtectedRoute>
+              <KanbanBoardPage/>
+            </ProtectedRoute>  
           }/>
         </Routes>
       </BrowserRouter>

@@ -23,7 +23,7 @@ router.post("/",authMiddleWare,checkOrgAccess("member",fromBoardId),async(req,re
 
 router.get("/",authMiddleWare,checkOrgAccess("member",fromBoardId),async(req,res)=>{
     try{
-        const{sectionId,boardId}=req.body;
+        const{sectionId,boardId}=req.query;
         const issues:any=await getIssues(Number(boardId),Number(sectionId??null));
         if(issues?.error){
             return res.status(400).send(issues?.message);
@@ -65,7 +65,7 @@ router.put("/:id",authMiddleWare,checkOrgAccess("member",fromIssueId),async(req,
 });
 
 router.put("/:id/move",authMiddleWare,checkOrgAccess("member",fromIssueId),async(req,res)=>{
-    try{
+    try{//should we also consider boardid here 
         const {id}=req.params;
         const {sectionId}=req.body;
         const issue:any=await moveIssue(

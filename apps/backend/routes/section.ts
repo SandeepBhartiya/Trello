@@ -25,7 +25,7 @@ router.post("/",authMiddleWare,checkOrgAccess("member",fromBoardId),async(req,re
 
 router.get("/",authMiddleWare,checkOrgAccess("member",fromBoardId),async(req,res)=>{
     try{
-        const {boardId}=req.body;
+        const {boardId}=req.query??req.params;
         const sections:any=await getSections(Number(boardId));
         if(sections?.error){
             return res.status(400).send(sections?.message);
