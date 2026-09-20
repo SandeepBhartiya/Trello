@@ -5,7 +5,7 @@ export const fromBody=async(req:Request)=>req.body.organizationId??req.body.orgI
 export const fromParams=async(req:Request)=>req.params.organizationId??req.params.orgId;
 export const fromQuery:any=async(req:Request)=>req.query.organizationId??req.query.orgId;
 export const fromBoardId=async(req:Request)=>{
-    const boardId=req.params.id || req.query.boardId;
+    const boardId=req.params.id || req.query.boardId||req.body.boardId;
     if(!boardId){
         return null;
     }
@@ -15,7 +15,7 @@ export const fromBoardId=async(req:Request)=>{
 }
 
 export const fromSectionId=async(req:Request)=>{
-    const sectionId=req.params.id || req.body.sectionId;
+    const sectionId=req.params.id || req.query.id;
     if(!sectionId){
         return null;
     }

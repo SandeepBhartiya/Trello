@@ -16,7 +16,7 @@ router.post("/",authMiddleWare,checkOrgAccess("member",fromBoardId),async(req,re
         if(section?.error){
             return res.status(400).send(section?.message);
         }
-        return res.status(201).send("Section created successfully"); 
+        return res.status(201).send({message:"Section created successfully",data:section}); 
     }catch(err){
         console.log(err);
         return res.status(500).send("Failed to create section");
@@ -39,7 +39,7 @@ router.get("/",authMiddleWare,checkOrgAccess("member",fromBoardId),async(req,res
 
 router.put("/:id",authMiddleWare,checkOrgAccess("member",fromSectionId),async(req,res)=>{
     try{
-        const {id}=req.params;
+        const {id}=req.params||req.query;
         const {title}=req.body;
         if(!title){
             return res.status(400).send("Title are required");

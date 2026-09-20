@@ -25,9 +25,16 @@ export default function KanbanBoardPage(){
     const loadBoards=async()=>{
         setLoading(true);
         try{
-            const sectionData=await getSections(id);
-            const sectionId=sectionData?.[0]?.id; //should check if there is multiple  section id then logic may change and loop can be use
-            const issueData=await getIssues(id,sectionId);
+            const sectionData:Section[]=await getSections(id);
+            let issueData:Issue[]=[];
+
+            if(sectionData && sectionData.length>0){
+                const issueResult=await Promise.all(
+                    sectionData.map((section:any)=>getIssues(id,section.id))
+                );
+                issueData=issueResult.flat();
+            }
+
             setSections(sectionData??[]);
             setIssues(issueData??[]);
             MessageBox({title:"Success",message:"Board loaded successfully",type:"success"});
@@ -42,8 +49,8 @@ export default function KanbanBoardPage(){
     const handleAddSection=async()=>{
         if(!newSectionTitle.trim())return;
         try{
-            const section=await createSection(newSectionTitle.trim(),id);
-            setSections((prev)=>[...prev,section]);
+            const section:any=await createSection(newSectionTitle.trim(),id);
+            setSections((prev)=>[...prev,section?.data]);
             setNewSectionTitle("");
             setAddingSection(false);
             MessageBox({title:"Success",message:"Section created successfully",type:"success"});
@@ -52,7 +59,7 @@ export default function KanbanBoardPage(){
         }
     }
 
-    const handelAddIssue=async(sectionId:number,title:string)=>{
+    const handelAddIssue=async(sectionId:number,title:string)=>{//in this we don't add desc bc it happen in issue form
         try{
             const issue=await createIssue(id,sectionId,title);
             setIssues((prev)=>[...prev,issue]);
