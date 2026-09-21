@@ -1,7 +1,7 @@
 import { useState,useEffect } from "react";
 import {useNavigate,useParams} from "react-router";
 import { getSections,createSection } from "../api/section";
-import { getIssues,createIssue } from "../api/issue";
+import { getIssues,createIssue, deleteIssue } from "../api/issue";
 import SectionColumn from "../components/SectionColumn";
 import type { Section,Issue } from "../types";
 import { MessageBox } from "../components/MessageBox";
@@ -69,6 +69,26 @@ export default function KanbanBoardPage(){
         }
     }
 
+    const handleIssueDelete=async(issueId:number)=>{ //need to check as issue form is not created now
+        try{
+            await deleteIssue(issueId);
+            setIssues((prev)=>prev.filter((i)=>i.id!==issueId));
+            // MessageBox({title:"Success",message:"Issue deleted successfully",type:"success"});
+        }catch(err:any){
+            MessageBox({title:"Error",message:err.message,type:"error"});
+        }
+    }
+
+    const hanleSectionUpdate=async(update:Section)=>{
+        setSections((prev)=>prev.map((s)=>(s.id===update.id?update:s)));
+    }
+
+    const handleSectionDelete=async(sectionId:number)=>{
+        setSections((prev)=>prev.filter((section)=>section.id!==sectionId));
+        setIssues((prev)=> prev.map((i) => (i.sectionId === sectionId ? { ...i, sectionId: null } : i)));
+    }
+
+
     const handleIssueClick=(issue:Issue)=>{
         navigate(`/issue/${issue.id}`);
     }
@@ -88,6 +108,9 @@ export default function KanbanBoardPage(){
                         issues={issues.filter((issue)=>issue.sectionId===section.id)} 
                         onAddIssue={handelAddIssue} 
                         onIssueClick={handleIssueClick}
+                        onIssueDelete={handleIssueDelete}
+                        onSectionUpdate={hanleSectionUpdate}
+                        onSectionDelete={handleSectionDelete}
                     />
                 ))}
 

@@ -62,6 +62,72 @@
   margin-left: 6px;
 }
 
+.kanban-column-title-input {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 2px 4px;
+  font-family: var(--font-family);
+  width: 100%;
+}
+
+.kanban-column-title-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: #2a2a30;
+  border-radius: 4px;
+}
+
+.kanban-column-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.kanban-column:hover .kanban-column-actions {
+  opacity: 1;
+}
+
+.kanban-icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 3px 5px;
+  border-radius: 4px;
+}
+
+.kanban-icon-btn:hover {
+  background: #2a2a30;
+  color: var(--color-text);
+}
+
+.kanban-icon-btn.danger:hover {
+  color: var(--color-error);
+}
+
+.kanban-card-wrap {
+  position: relative;
+}
+
+.kanban-card-actions {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.kanban-card-wrap:hover .kanban-card-actions {
+  opacity: 1;
+}
+
 .kanban-column-menu {
   background: transparent;
   border: none;

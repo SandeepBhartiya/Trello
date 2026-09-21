@@ -36,7 +36,7 @@ export interface Board{
 
 export interface Section{
     id:number;
-    title: String;
+    title: string;
     boardId: number;
 }
 
