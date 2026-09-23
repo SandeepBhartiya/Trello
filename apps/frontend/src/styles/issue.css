@@ -197,3 +197,17 @@
 .issue-delete-btn:hover {
   background: rgba(220, 38, 38, 0.1);
 }
+
+.issue-comment-edit-input {
+  width: 100%;
+  background: #26262b;
+  border: 1px solid var(--color-primary);
+  border-radius: 6px;
+  color: var(--color-text);
+  font-size: 13px;
+  padding: 6px 8px;
+  margin-top: 2px;
+  resize: none;
+  outline: none;
+  font-family: var(--font-family);
+}
