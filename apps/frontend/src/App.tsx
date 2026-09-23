@@ -6,6 +6,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import OrgListPage from "./pages/OrgListPage";
 import BoardListPage from "./pages/BoardListPage";
 import KanbanBoardPage from "./pages/KanbanBoardPage";
+import IssueDetailPage from "./pages/IssueDetailPage";
 
 export default function App(){
   return(
@@ -30,6 +31,11 @@ export default function App(){
               <KanbanBoardPage/>
             </ProtectedRoute>  
           }/>
+          <Route  path="/issue/:issueId" element={
+            <ProtectedRoute>
+              <IssueDetailPage/>
+            </ProtectedRoute>
+            }/>
         </Routes>
       </BrowserRouter>
     </AuthProvider>

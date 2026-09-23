@@ -1,7 +1,7 @@
 export interface User{
     id:number;
     email: String;
-    username: String;
+    username: string;
 }
 
 export interface Org{
@@ -42,8 +42,8 @@ export interface Section{
 
 export interface Issue{
     id:number;
-    title: String;
-    description?: String;
+    title: string;
+    description?: string;
     boardId: number;
     sectionId: number | null;
 }
