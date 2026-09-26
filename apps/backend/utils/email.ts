@@ -1,6 +1,27 @@
-import {Resend } from "resend";
+import nodemailer from "nodemailer";
 
-const resend=new Resend(process.env.RESEND_API_KEY);
+export const sendNotification=async(to:string,subject:string,html:string)=>{
+    try{
+        const transporter=nodemailer.createTransport({
+            host:process.env.SMTP_HOST || "smtp.gmail.com",
+            port:Number(process.env.SMTP_PORT)||587,    
+            secure:false,
+            auth:{
+                user:process.env.SMTP_USER,
+                pass:process.env.SMTP_PASS
+            }
+        });
+        
+        return await transporter.sendMail({
+            from:`"Trello App" <${process.env.SMTP_USER}>`,
+            to,
+            subject,
+            html,
+        });
+    }catch(err){
+        console.error(err);
+    }
+}
 
 export const sendInviteEmail=async(to:string,orgName:string,inviteLink:string )=>{
     try{
@@ -12,18 +33,6 @@ export const sendInviteEmail=async(to:string,orgName:string,inviteLink:string )=
                     <p style="color:#888; font-size:12px; margin-top:16px">If you didn't request an invite, you can safely ignore this email.</p>
                     </div>`;
         return await sendNotification(to,subject,html);
-    }catch(err){
-        console.error(err);
-    }
-}
-export const sendNotification=async(to:string,subject:string,html:string)=>{
-    try{
-        return await resend.emails.send({
-            from:'Trello App <onboarding@resend.dev>',
-            to,
-            subject,
-            html,
-        });
     }catch(err){
         console.error(err);
     }

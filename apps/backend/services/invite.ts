@@ -2,6 +2,7 @@ import {prisma} from "db/client";
 import {sendInviteEmail} from "../utils/email";
 export const createInvite=async(inviteId:number,orgId:number,emailid:string)=>{
     try{
+        const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
         const existingUser=await prisma.user.findUnique({where:{email:emailid}});
         if(!existingUser){ //check if user exists
             return{
@@ -26,7 +27,7 @@ export const createInvite=async(inviteId:number,orgId:number,emailid:string)=>{
         }
         const invite=await prisma.invite.upsert({where:{email_orgId:{email:emailid,orgId:orgId},},update:{status:"pending",invitedBy:existingUser?.id},create:{email:emailid,orgId:orgId,status:"pending",invitedBy:existingUser?.id},});
         const org:any=await prisma.org.findUnique({where:{id:orgId},select:{name:true}});
-        const inviteLink=`http://localhost:3000/invite/${inviteId}`;
+        const inviteLink=`${FRONTEND_URL}/accept-invite?orgId=${orgId}`;
         await sendInviteEmail(emailid,org?.name,inviteLink);
         return invite;
     }catch(err){
@@ -52,7 +53,7 @@ export const acceptInvite=async(userId:number,orgId:number)=>{
             }
         }
         const membership=await prisma.$transaction(async(tx)=>{
-            const newMembership=await tx.membership.create({data:{userId:userId,orgId:orgId,role:"member"}});
+            const newMembership=await tx.membership.create({data:{userId:userId,orgId:orgId,role:"member",accepted:true}});
             await tx.invite.update({where:{id:invite?.id},data:{status:"accepted"}});
             return newMembership;
         });

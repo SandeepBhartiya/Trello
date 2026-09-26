@@ -2,8 +2,8 @@ import { Router } from "express";
 import { authMiddleWare } from "../middleware/auth";
 import { checkOrgAccess } from "../middleware/checkOrgAccess";
 import { createInvite,acceptInvite } from "../services/invite";
-import { removeMembership } from "../services/membership";
-import { fromBody } from "../middleware/resolver";
+import { removeMembership,getMembers } from "../services/membership";
+import { fromBody,fromQuery } from "../middleware/resolver";
 
 const router=Router();
 
@@ -34,6 +34,19 @@ router.post("/accept",authMiddleWare,async(req,res)=>{
     }
 });
 
+router.get("/membership",authMiddleWare,checkOrgAccess("member", fromQuery),async(req,res)=>{
+    try{
+        const {orgId}=req.query;
+        const members:any=await getMembers(Number(orgId));
+        if(members?.error){
+            return res.status(400).send(members?.message);
+        }
+        return res.status(200).send(members);
+    }catch(err){
+        return res.status(500).send("Failed to get members");
+    }
+});
+
 router.delete("/membership",authMiddleWare,async(req,res)=>{//i think admin can remove member
     try{
         const {userId,targetUserId,orgId}=req.body;
@@ -45,6 +58,6 @@ router.delete("/membership",authMiddleWare,async(req,res)=>{//i think admin can 
     }catch(err){
         return res.status(500).send("Failed to remove membership");
     }
-})
+});
 
 export default router;

@@ -15,6 +15,23 @@ export const checkMembership=async(userId:number,orgId:number)=>{
         return err;
     }
 }
+
+export const getMembers=async(orgId:number)=>{
+    try{
+        const members=await prisma.membership.findMany({
+            where:{orgId:orgId},
+            include:{
+                user:{
+                    select:{id:true,email:true,username:true},   
+                }
+            }
+        });
+        return members;
+    }catch(err){
+        return {error:true,message:"Failed to get members"};
+    }
+}
+
 export const removeMembership=async(requesterId:number,targetUserId:number,orgId:number)=>{
     try{
         const requesterMembership=await prisma.membership.findFirst({where:{userId:requesterId,orgId:orgId}}); //check if requester is a member of the organization

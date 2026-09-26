@@ -17,11 +17,12 @@ export interface Membership{
     orgId: number;
     role: "admin"|"member";   
     accepted: boolean;
+    user: { id: number; email: string; username: string };
 }
 
 export interface Invite{
     id:number;
-    email: String;
+    email: string;
     orgId: number;
     status: "pending" | "accepted";
     invitedBy: number;

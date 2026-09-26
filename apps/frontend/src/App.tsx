@@ -7,6 +7,8 @@ import OrgListPage from "./pages/OrgListPage";
 import BoardListPage from "./pages/BoardListPage";
 import KanbanBoardPage from "./pages/KanbanBoardPage";
 import IssueDetailPage from "./pages/IssueDetailPage";
+import MembersPage from "./pages/MembersPage";
+import AcceptInvitePage from "./pages/AcceptInvitePage";
 
 export default function App(){
   return(
@@ -35,7 +37,17 @@ export default function App(){
             <ProtectedRoute>
               <IssueDetailPage/>
             </ProtectedRoute>
-            }/>
+          }/>
+          <Route path="/organizations/:orgId/members" 
+            element={
+              <ProtectedRoute>
+                <MembersPage/>
+              </ProtectedRoute>
+          }/>
+          <Route path="/accept-invite" 
+            element={
+              <AcceptInvitePage />
+          } />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
