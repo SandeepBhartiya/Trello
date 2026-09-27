@@ -8,7 +8,7 @@ export const createIssue=(
     title:string,
     description?:string)=>apiClient<Issue>("/issue",{method:"POST",body:{boardId,sectionId,title,description}});
     
-export const getIssues=(boardId:number,sectionId:number)=>apiClient<Issue[]>(`/issue?boardId=${boardId}&sectionId=${sectionId}`,{method:"GET"});
+export const getIssues=(boardId:number,sectionId?:number)=>apiClient<Issue[]>(`/issue?boardId=${boardId}${sectionId?`&sectionId=${sectionId}`:""}`,{method:"GET"});
     
 export const getIssue=(id:number)=>apiClient<Issue>(`/issue/${id}`,{method:"GET"});
 

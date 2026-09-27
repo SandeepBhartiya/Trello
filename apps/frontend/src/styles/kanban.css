@@ -271,3 +271,8 @@
   padding: 8px 10px;
   outline: none;
 }
+
+.kanban-cards.drag-over {
+  background: rgba(99, 102, 241, 0.08);
+  border-radius: 6px;
+}

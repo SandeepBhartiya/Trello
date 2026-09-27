@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useDroppable } from "@dnd-kit/core";
+import { SortableContext,verticalListSortingStrategy } from "@dnd-kit/sortable";
 import IssueCard from "./IssueCard";
 import AddIssueForm from "./AddIssueForm";
 import { updateSection,deleteSection } from "../api/section";
@@ -20,6 +22,11 @@ export default function SectionColumn({section,issues,onAddIssue,onIssueClick,on
     const [editingTitle,setEditingTitle]=useState(false);
     const [title,setTitle]=useState(section.title);
     
+    const {setNodeRef,isOver}=useDroppable({
+        id:`section-${section.id}`,
+        data:{type:"section",sectionId:section.id}
+    });
+
     const handelTitleSave=async()=>{
         setEditingTitle(false);
         if(!title.trim()||title.trim()===section.title){
@@ -105,7 +112,7 @@ export default function SectionColumn({section,issues,onAddIssue,onIssueClick,on
                         }}  
                     /> 
                 ):(
-                <div>
+                <div onClick={()=>setEditingTitle(true)} style={{cursor:"text",flex:1}}>
                     <div className="kanban-column-title">{section.title}</div>
                     <div className="kanban-column-count">{issues.length}</div>
                 </div>
@@ -115,27 +122,39 @@ export default function SectionColumn({section,issues,onAddIssue,onIssueClick,on
                     <div className="kanban-icon-btn danger" onClick={(e)=>{e.stopPropagation();handelSectionDelete(section.id)}}>🗑️</div>
                 </div>
             </div>
-
-
-            <div className="kanban-cards">
-                {issues.map((issue)=>(
-                    <div key={issue.id} className="kanban-card-warp">
-                        <IssueCard key={issue.id} issue={issue} onClick={()=>onIssueClick(issue)}/>
-                        <div className="kanban-card-actions">
-                            <button className="kanban-icon-btn danger" 
-                                onClick={(e)=>{e.stopPropagation(); handelIssueDelete(issue.id)}}
-                            >🗑</button>
-                        </div>
+            
+            <SortableContext items={issues.map((i) => i.id)} strategy={verticalListSortingStrategy}>
+                <div ref={setNodeRef} className={`kanban-cards ${isOver ? "drag-over" : ""}`}>
+                {issues.map((issue) => (
+                    <div key={issue.id} className="kanban-card-wrap">
+                    <IssueCard issue={issue} onClick={() => onIssueClick(issue)} />
+                    <div className="kanban-card-actions">
+                        <button
+                        className="kanban-icon-btn danger"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handelIssueDelete(issue.id);
+                        }}
+                        >
+                        🗑
+                        </button>
+                    </div>
                     </div>
                 ))}
-            </div>
+                </div>
+            </SortableContext>
             {adding?(
-                <AddIssueForm onAdd={(title)=>onAddIssue(section.id,title)} onCancel={()=>setAdding(false)}/>
+                <AddIssueForm 
+                onAdd={(title)=>{
+                    onAddIssue(section.id,title);
+                    setAdding(false);
+                }} 
+                onCancel={()=>setAdding(false)}/>
             ):(
-                <button className="kanban-add-card-btn" onClick={()=>setAdding(true)}>+ Add Card</button>
+                <button className="kanban-add-card-btn" onClick={()=>setAdding(true)}>
+                    + Add Card
+                </button>
             )}
         </div>
-
-
     );
 }

@@ -82,7 +82,12 @@ export  default function SigninPage(){
                         {loading ? "Signing in..." : "Sign in"}
                     </button>
                 </form>
-             <p className="auth-switch">Don't have an account? <Link to="/signup">Sign up</Link></p>
+                <p className="auth-switch">
+                    No account?{" "}
+                    <Link to={redirect ? `/signup?redirect=${encodeURIComponent(redirect)}` : "/signup"}>
+                        Sign up
+                    </Link>
+                </p>
             </div>
         </div>
     )

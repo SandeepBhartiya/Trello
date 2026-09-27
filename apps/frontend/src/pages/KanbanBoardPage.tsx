@@ -1,8 +1,18 @@
 import { useState,useEffect } from "react";
 import {useNavigate,useParams} from "react-router";
+import { 
+    DndContext,
+    DragOverlay,
+    closestCorners,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    type DragStartEvent,
+    type DragEndEvent } from "@dnd-kit/core";
 import { getSections,createSection } from "../api/section";
-import { getIssues,createIssue, deleteIssue } from "../api/issue";
+import { getIssues,createIssue, deleteIssue,moveIssue } from "../api/issue";
 import SectionColumn from "../components/SectionColumn";
+import IssueCard from "../components/IssueCard";
 import type { Section,Issue } from "../types";
 import { MessageBox } from "../components/MessageBox";
 import "../styles/kanban.css";
@@ -13,11 +23,16 @@ export default function KanbanBoardPage(){
     const [loading,setLoading]=useState(true);
     const [addingSection,setAddingSection]=useState(false);
     const [newSectionTitle,setNewSectionTitle]=useState("");
+    const [activeIssue,setActiveIssue]=useState<Issue|null>(null);
     
     const {boardId}=useParams();
     const id=Number(boardId);
     const navigate=useNavigate();
 
+    const sensors=useSensors(
+      useSensor(PointerSensor,{activationConstraint:{distance:5}})  
+    );
+    
     useEffect(()=>{
         loadBoards();
     },[id])
@@ -26,15 +41,7 @@ export default function KanbanBoardPage(){
         setLoading(true);
         try{
             const sectionData:Section[]=await getSections(id);
-            let issueData:Issue[]=[];
-
-            if(sectionData && sectionData.length>0){
-                const issueResult=await Promise.all(
-                    sectionData.map((section:any)=>getIssues(id,section.id))
-                );
-                issueData=issueResult.flat();
-            }
-
+            const issueData:Issue[]=await getIssues(id);
             setSections(sectionData??[]);
             setIssues(issueData??[]);
             MessageBox({title:"Success",message:"Board loaded successfully",type:"success"});
@@ -93,52 +100,104 @@ export default function KanbanBoardPage(){
         navigate(`/issue/${issue.id}`);
     }
 
+    const handleDragStart = (event: DragStartEvent) => {
+        const issue = issues.find((i) => i.id === event.active.id);
+        setActiveIssue(issue ?? null);
+    };
+
+    const handleDragEnd = async (event: DragEndEvent) => {
+        setActiveIssue(null);
+        const { active, over } = event;
+        if (!over) return;
+
+        const issueId = Number(active.id);
+        const draggedIssue = issues.find((i) => i.id === issueId);
+        if (!draggedIssue) return;
+
+        // figure out the target section: either dropped directly on a column,
+        // or dropped on another issue (inherit that issue's section)
+        let targetSectionId: number | null = null;
+        const overData = over.data.current;
+
+        if (overData?.type === "section") {
+        targetSectionId = overData.sectionId;
+        } else if (overData?.type === "issue") {
+        targetSectionId = overData.issue.sectionId;
+        } else {
+        return; // dropped somewhere unrecognized
+        }
+
+        if (targetSectionId === draggedIssue.sectionId) return; // no actual move
+
+        // optimistic update — reflect the move immediately, before the API confirms
+        const previousIssues = issues;
+        setIssues((prev) =>
+        prev.map((i) => (i.id === issueId ? { ...i, sectionId: targetSectionId } : i))
+        );
+
+        try {
+            await moveIssue(issueId, targetSectionId);
+        } catch (err: any) {
+            setIssues(previousIssues); // revert on failure
+            MessageBox({title:"Error",message:err.message,type:"error"});
+        }
+  };
+
     if(loading)return(<div className="board-loading">Loading...</div>);
     return(
         <div className="kanban-page">
             <div className="kanban-header">
                 <h1>Board</h1>
             </div>
+            <DndContext
+                sensors={sensors}
+                collisionDetection={closestCorners}
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
+            >
+                <div className="kanban-board">
+                    {sections.map((section)=>(
+                        <SectionColumn 
+                            key={section.id} 
+                            section={section} 
+                            issues={issues.filter((issue)=>issue.sectionId===section.id)} 
+                            onAddIssue={handelAddIssue} 
+                            onIssueClick={handleIssueClick}
+                            onIssueDelete={handleIssueDelete}
+                            onSectionUpdate={hanleSectionUpdate}
+                            onSectionDelete={handleSectionDelete}
+                        />
+                    ))}
 
-            <div className="kanban-board">
-                {sections.map((section)=>(
-                    <SectionColumn 
-                        key={section.id} 
-                        section={section} 
-                        issues={issues.filter((issue)=>issue.sectionId===section.id)} 
-                        onAddIssue={handelAddIssue} 
-                        onIssueClick={handleIssueClick}
-                        onIssueDelete={handleIssueDelete}
-                        onSectionUpdate={hanleSectionUpdate}
-                        onSectionDelete={handleSectionDelete}
-                    />
-                ))}
-
-                {addingSection?(
-                    <div className="kanban-column-new-form">
-                        <input
-                            autoFocus
-                            placeholder="Enter a section title..."
-                            value={newSectionTitle}
-                            onChange={(e)=>setNewSectionTitle(e.target.value)}
-                            onKeyDown={(e)=>{
-                                if(e.key==="Enter" && e.shiftKey){
-                                    e.preventDefault();
-                                    handleAddSection();
-                                }
-                                if(e.key==="Escape"){
-                                    setAddingSection(false);
-                                }
-                            }}
-                            onBlur={()=>!newSectionTitle  && setAddingSection(false)}
-                        />    
-                    </div>
-                ):(
-                    <div className="kanban-column-new" onClick={()=>setAddingSection(true)}>
-                        + Add Section
-                    </div>
-                )}
-            </div>
+                    {addingSection?(
+                        <div className="kanban-column-new-form">
+                            <input
+                                autoFocus
+                                placeholder="Enter a section title..."
+                                value={newSectionTitle}
+                                onChange={(e)=>setNewSectionTitle(e.target.value)}
+                                onKeyDown={(e)=>{
+                                    if(e.key==="Enter" && e.shiftKey){
+                                        e.preventDefault();
+                                        handleAddSection();
+                                    }
+                                    if(e.key==="Escape"){
+                                        setAddingSection(false);
+                                    }
+                                }}
+                                onBlur={()=>!newSectionTitle  && setAddingSection(false)}
+                            />    
+                        </div>
+                    ):(
+                        <div className="kanban-column-new" onClick={()=>setAddingSection(true)}>
+                            + Add Section
+                        </div>
+                    )}
+                </div>
+                <DragOverlay>
+                    {activeIssue ? <IssueCard issue={activeIssue} onClick={() => {}} /> : null}
+                </DragOverlay>
+            </DndContext>
         </div>
     );
 
