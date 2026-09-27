@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {useNavigate,Link} from "react-router";
+import {useNavigate,Link,useSearchParams} from "react-router";
 import {ToastContainer, toast} from "react-toastify";
 import { signup } from "../api/auth";
 import {useAuth} from "../context/AuthContext";
@@ -18,6 +18,8 @@ export default function SignupPage() {
 
     const {login}=useAuth();
     const navigate=useNavigate();
+    const [searchParams] = useSearchParams();
+    const redirect = searchParams.get("redirect");
 
     const handelSubmit=async(e:React.FormEvent)=>{
         e.preventDefault();
@@ -35,7 +37,7 @@ export default function SignupPage() {
             const {user,token}=await signup(email,username,password);
             toast.success("Signed up successfully");
             login(user,token);
-            navigate("/");
+            navigate(redirect || "/");
         }catch(err:any){
             toast.error(err.message || "SignUp Failed");
         }finally{
@@ -92,7 +94,11 @@ export default function SignupPage() {
                         {loading ? "Signing up..." : "Sign up"}
                     </button>
                 </form>
-                <p>Already have an account? <Link to="/signin">Login</Link></p>
+                <p>Already have an account? 
+                    <Link to={redirect ? `/signin?redirect=${encodeURIComponent(redirect)}` : "/signin"}>
+                        Sign in
+                    </Link>
+                </p>
             </div>
         </div>
     )

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router";
+import { useNavigate,useSearchParams, Link } from "react-router";
 import {ToastContainer, toast} from "react-toastify";
 import { signin } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
@@ -18,6 +18,8 @@ export  default function SigninPage(){
     
     const {login}=useAuth();
     const navigate=useNavigate();
+    const [searchParams] = useSearchParams();
+    const redirect=searchParams.get("redirect");
 
     const handelSubmit=async(e:React.FormEvent)=>{
         e.preventDefault();
@@ -34,7 +36,7 @@ export  default function SigninPage(){
             const data:any=await signin(email,password);
             toast.success("Signed in successfully");
             login(data?.username,data?.token); 
-            navigate("/organizations");
+            navigate(redirect || "/organizations");
         }catch(err:any){
             toast.error(err.message || "SignIn Failed");
         }finally{
