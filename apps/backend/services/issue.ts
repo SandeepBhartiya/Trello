@@ -1,4 +1,5 @@
 import {prisma} from "db/client";
+const userSelect = { select: { id: true, email: true, username: true } };
 
 export const createIssue=async(boardid:number,sectionid:number,title:string,description:string)=>{
     try{
@@ -15,7 +16,13 @@ export const createIssue=async(boardid:number,sectionid:number,title:string,desc
 
 export const getIssues=async(boardid:number,sectionid:number)=>{
     try{
-        const issues=await prisma.issue.findMany({where:{boardId:boardid,...(sectionid?{sectionId:sectionid}:{}),}});        
+        const issues=await prisma.issue.findMany({
+            where:{boardId:boardid,...(sectionid?{sectionId:sectionid}:{}),},
+            include:{issuesMapping:{include:{user:userSelect}}},
+        });      
+        if(!issues){
+            return {error:true,message:"Failed to get issues"}
+        }  
         return issues;
     }catch(err){
         console.log(err);
@@ -25,7 +32,17 @@ export const getIssues=async(boardid:number,sectionid:number)=>{
 
 export const getIssueById=async(issueid:number)=>{
     try{
-        const issue=await prisma.issue.findUnique({where:{id:issueid},include:{issuesMapping:{include:{user:true}},comments:{include:{user:true}}}});
+        const issue=await prisma.issue.findUnique({
+            where:{id:issueid},
+            include:{
+                board:true,
+                issuesMapping:{include:{user:userSelect}},
+                comments:{include:{user:userSelect}}
+            }
+        });
+        if(!issue){
+            return {error:true,message:"Failed to get issue"};
+        }
         return issue;
     }catch(err){
         console.log(err);
@@ -69,6 +86,14 @@ export const deleteIssue=async(issueid:number)=>{
 
 export const assignUser=async(issueid:number,userid:number)=>{
     try{
+        const issue=await prisma.issue.findUnique({where:{id:issueid},include:{board:true}}); //check if issue exists
+        if(!issue){
+            return {error:true,message:"Issue does not exist"}
+        }
+        const membership=await prisma.membership.findFirst({where:{userId:userid,orgId:issue?.board?.organizationId,accepted:true}}); //check if user is a member of the organization
+        if(!membership){
+            return {error:true,message:"User is not a member of the organization"}
+        }
         const existing=await prisma.issuesMapping.findFirst({where:{issueId:issueid,userId:userid}}); //check if user is already assigned to the issue
         if(existing){
             return {error:true,message:"User is already assigned to the issue"};

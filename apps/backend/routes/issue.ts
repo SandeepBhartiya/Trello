@@ -95,11 +95,11 @@ router.delete("/:id",authMiddleWare,checkOrgAccess("admin",fromIssueId),async(re
     }
 });
 
-router.post("/:id/assign",authMiddleWare,checkOrgAccess("admin",fromIssueId),async(req,res)=>{
+router.post("/:id/assign",authMiddleWare,checkOrgAccess("member",fromIssueId),async(req,res)=>{
     try{
         const {id}=req.params;
-        const {userId}=req.body;
-        const issue:any=await assignUser(Number(id),Number(userId));
+        const {assignUserId}=req.body;
+        const issue:any=await assignUser(Number(id),Number(assignUserId));
         if(issue?.error){
             return res.status(400).send(issue?.message);
         }
@@ -110,11 +110,11 @@ router.post("/:id/assign",authMiddleWare,checkOrgAccess("admin",fromIssueId),asy
     }
 });
 
-router.delete("/:id/assign",authMiddleWare,checkOrgAccess("admin",fromIssueId),async(req,res)=>{
+router.delete("/:id/assign",authMiddleWare,checkOrgAccess("member",fromIssueId),async(req,res)=>{
     try{
         const {id}=req.params;
-        const {userId}=req.body;
-        const issue:any=await unassignUser(Number(id),Number(userId));
+        const {assignUserId}=req.body;
+        const issue:any=await unassignUser(Number(id),Number(assignUserId));
         if(issue?.error){
             return res.status(400).send(issue?.message);
         }  

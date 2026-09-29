@@ -1,5 +1,5 @@
 import { apiClient } from "./client";
-import type { Issue } from "../types";
+import type { Issue,IssueMapping } from "../types";
 
 
 export const createIssue=(
@@ -19,9 +19,9 @@ export const moveIssue=(id:number,sectionId:number|null)=>apiClient<Issue>(`/iss
 export const deleteIssue=(id:number)=>apiClient<{message:string}>(`/issue/${id}`,{method:"DELETE"});
 
 //can be use assignUser in different file
-export const assignUser=(id:number,userId:number)=>apiClient<Issue>(`/issue/${id}/assign`,{method:"POST",body:{userId}});
+export const assignUser=(issueId:number,assignUserId:number)=>apiClient<IssueMapping>(`/issue/${issueId}/assign`,{method:"POST",body:{assignUserId}});
 
-export const unassignUser=(id:number,userId:number)=>apiClient<Issue>(`/issue/${id}/assign`,{method:"DELETE",body:{userId}});
+export const unassignUser=(issueId:number,assignUserId:number)=>apiClient<{message:string}>(`/issue/${issueId}/assign`,{method:"DELETE",body:{assignUserId}});
 
 
 

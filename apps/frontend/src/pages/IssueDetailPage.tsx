@@ -4,8 +4,10 @@ import {updateIssue,getIssue,deleteIssue} from "../api/issue"
 import {createComment,updateComment,deleteComment} from "../api/comment"
 import { getAvatarColor } from "../utils/avatarColor"
 import {useAuth} from "../context/AuthContext"
-import type {Issue,Comment} from "../types"
+import type {Issue,Comment,IssueMapping} from "../types"
 import { MessageBox } from "../components/MessageBox"
+import { assignUser,unassignUser } from "../api/issue"
+import {getMembers} from "../api/membership"
 import "../styles/issue.css"
 
 export default function IssueDetailPage(){
@@ -27,6 +29,8 @@ export default function IssueDetailPage(){
     const [newComment,setNewComment]=useState("");
     const [postingComment,setPostingComment]=useState(false);
 
+    const [assignees, setAssignees] = useState<IssueMapping[]>([]);
+    const [members, setMembers] = useState<any[]>([]);
     useEffect(()=>{
         loadIssue();
     },[id]);
@@ -39,6 +43,12 @@ export default function IssueDetailPage(){
             setTitle(data?.title||" ");
             setDescription(data?.description||"");
             setComments(data?.comments??[]);
+            setAssignees(data?.issuesMapping??[]);
+            const orgId=data?.board.organizationId;
+            if(orgId){
+                const members=await getMembers(orgId);
+                setMembers((members ?? []).filter((m: any) => m.accepted));
+            }
         }catch(err:any){
             MessageBox({title:"Error",message:err.message,type:"error"});
         }finally{
@@ -137,8 +147,41 @@ export default function IssueDetailPage(){
         });
     }
 
+    const availableMembers = members.filter(
+      (m) => !assignees.some((a) => Number(a.userId) === Number(m.userId))
+    );
+
+    const handleAssign = async (assignUserId: number) => {
+      if (!issue) return;
+      try {
+        const mapping = await assignUser(issue.id, assignUserId);
+        const member = members.find((m) => Number(m.userId) === assignUserId);
+        setAssignees((prev) => [...prev, { ...mapping, user: member?.user }]);
+      } catch (err: any) {
+        MessageBox({
+          title: "Error",
+          message: err.message || "Failed to assign user",
+          type: "error"
+        });
+      }
+  };
+
+    const handleUnassign = async (assignUserId: number) => {
+      if (!issue) return;
+      try {
+        await unassignUser(issue.id, assignUserId);
+        setAssignees((prev) => prev.filter((a) => Number(a.userId) !== Number(assignUserId)));
+      } catch (err: any) {
+        MessageBox({
+          title: "Error",
+          message: err.message || "Failed to unassign user",
+          type: "error"
+        })
+      }
+    };
+    
     if(loading) return <div className="board-loading">Loading issue...</div>;
-     if (!issue) return null;
+    if (!issue) return null;
 
     return(
     <div className="issue-page">
@@ -149,6 +192,37 @@ export default function IssueDetailPage(){
         onChange={(e) => setTitle(e.target.value)}
         onBlur={handleTitleBlur}
       />
+
+      <div className="issue-block-label">Assignees</div>
+      <div className="issue-assignees">
+        {assignees.map((a) => (
+          <div key={a.userId} className="issue-assignee-chip">
+            <div
+              className="issue-assignee-avatar"
+              style={{ background: getAvatarColor(a.user?.username || "?") }}
+            >
+              {(a.user?.username || "?").slice(0, 2)}
+            </div>
+            <span>{a.user?.username}</span>
+            <button onClick={() => handleUnassign(a.userId)}>×</button>
+          </div>
+        ))}
+
+        {availableMembers.length > 0 && (
+          <select
+            className="issue-assignee-select"
+            value=""
+            onChange={(e) => e.target.value && handleAssign(Number(e.target.value))}
+          >
+            <option value="">+ Assign member</option>
+            {availableMembers.map((m) => (
+              <option key={m.userId} value={m.userId}>
+                {m.user.username}
+              </option>
+            ))}
+          </select>
+        )}
+      </div>
 
       <div className="issue-block-label">Description</div>
       {editingDesc ? (

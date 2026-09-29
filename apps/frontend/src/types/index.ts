@@ -47,6 +47,8 @@ export interface Issue{
     description?: string;
     boardId: number;
     sectionId: number | null;
+    issuesMapping?: IssueMapping[];
+    board?: Board;
 }
 
 export interface IssueMapping{
