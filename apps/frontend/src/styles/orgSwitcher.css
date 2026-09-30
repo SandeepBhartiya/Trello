@@ -6,17 +6,20 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: transparent;
+  background: #232328;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: 6px 10px;
+  border-radius: 8px;
+  padding: 7px 12px;
   color: var(--color-text);
   font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .org-switcher-trigger:hover {
   border-color: var(--color-primary);
+  background: #26262c;
 }
 
 .org-switcher-avatar {
@@ -30,23 +33,24 @@
   font-weight: 700;
   color: #fff;
   text-transform: uppercase;
+  flex-shrink: 0;
 }
 
 .org-switcher-caret {
-  font-size: 10px;
+  font-size: 9px;
   color: var(--color-text-muted);
   margin-left: 2px;
 }
 
 .org-switcher-menu {
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + 8px);
   left: 0;
-  min-width: 220px;
-  background: var(--color-card-bg);
+  min-width: 230px;
+  background: #1c1c20;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
   padding: 6px;
   z-index: 60;
 }
@@ -63,7 +67,7 @@
 }
 
 .org-switcher-item:hover {
-  background: #26262b;
+  background: #29292f;
 }
 
 .org-switcher-item.active {
@@ -74,7 +78,7 @@
 .org-switcher-divider {
   height: 1px;
   background: var(--color-border);
-  margin: 6px 0;
+  margin: 6px 4px;
 }
 
 .org-switcher-all {

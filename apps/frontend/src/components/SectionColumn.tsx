@@ -21,7 +21,8 @@ export default function SectionColumn({section,issues,onAddIssue,onIssueClick,on
     const [adding,setAdding]=useState(false);
     const [editingTitle,setEditingTitle]=useState(false);
     const [title,setTitle]=useState(section.title);
-    
+    const isSynthetic = section.id === -1;
+
     const {setNodeRef,isOver}=useDroppable({
         id:`section-${section.id}`,
         data:{type:"section",sectionId:section.id}
@@ -112,15 +113,25 @@ export default function SectionColumn({section,issues,onAddIssue,onIssueClick,on
                         }}  
                     /> 
                 ):(
-                <div onClick={()=>setEditingTitle(true)} style={{cursor:"text",flex:1}}>
+                <div onClick={()=>!isSynthetic && setEditingTitle(true)} style={{cursor:isSynthetic ?"default":"text",flex:1}}>
                     <div className="kanban-column-title">{section.title}</div>
                     <div className="kanban-column-count">{issues.length}</div>
                 </div>
                 )}
-                <div className="kanban-column-actions">
-                    <div className="kanban-icon-btn" onClick={()=>setEditingTitle(true)}>✎</div>
-                    <div className="kanban-icon-btn danger" onClick={(e)=>{e.stopPropagation();handelSectionDelete(section.id)}}>🗑️</div>
-                </div>
+                {!isSynthetic && (
+                    <div className="kanban-column-actions">
+                    <button className="kanban-icon-btn" onClick={() => setEditingTitle(true)}>✎</button>
+                    <button
+                        className="kanban-icon-btn danger"
+                        onClick={(e) => {
+                        e.stopPropagation();
+                        handelSectionDelete(section.id);
+                        }}
+                    >
+                        🗑️
+                    </button>
+                    </div>
+                )}
             </div>
             
             <SortableContext items={issues.map((i) => i.id)} strategy={verticalListSortingStrategy}>

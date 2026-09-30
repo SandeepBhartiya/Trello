@@ -28,6 +28,7 @@ export default function KanbanBoardPage(){
     const {boardId}=useParams();
     const id=Number(boardId);
     const navigate=useNavigate();
+    const unsectionedIssues = issues.filter((i) => i.sectionId === null);
 
     const sensors=useSensors(
       useSensor(PointerSensor,{activationConstraint:{distance:5}})  
@@ -66,7 +67,7 @@ export default function KanbanBoardPage(){
         }
     }
 
-    const handelAddIssue=async(sectionId:number,title:string)=>{//in this we don't add desc bc it happen in issue form
+    const handleAddIssue=async(sectionId:number,title:string)=>{//in this we don't add desc bc it happen in issue form
         try{
             const issue=await createIssue(id,sectionId,title);
             setIssues((prev)=>[...prev,issue]);
@@ -161,14 +162,25 @@ export default function KanbanBoardPage(){
                             key={section.id} 
                             section={section} 
                             issues={issues.filter((issue)=>issue.sectionId===section.id)} 
-                            onAddIssue={handelAddIssue} 
+                            onAddIssue={handleAddIssue} 
                             onIssueClick={handleIssueClick}
                             onIssueDelete={handleIssueDelete}
                             onSectionUpdate={hanleSectionUpdate}
                             onSectionDelete={handleSectionDelete}
                         />
                     ))}
-
+                    {unsectionedIssues.length > 0 && (
+                        <SectionColumn
+                            key="unsectioned"
+                            section={{ id: -1, title: "Unsectioned", boardId: id }}
+                            issues={unsectionedIssues}
+                            onAddIssue={handleAddIssue}
+                            onIssueClick={handleIssueClick}
+                            onIssueDelete={handleIssueDelete}
+                            onSectionUpdate={() => {}}   
+                            onSectionDelete={() => {}}
+                        />
+                    )}
                     {addingSection?(
                         <div className="kanban-column-new-form">
                             <input
