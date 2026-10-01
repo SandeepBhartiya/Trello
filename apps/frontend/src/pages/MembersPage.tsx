@@ -7,15 +7,17 @@ import InviteMemberModal from "../components/InviteMemberModal";
 import type { Membership } from "../types";
 import "../styles/members.css";
 import { getAvatarColor } from "../utils/avatarColor";
+import { getUserIdFromToken } from "../utils/jwt";
 
 export default function MembersPage(){
     const {orgId}=useParams();
     const id=Number(orgId);
-    const {user}=useAuth();
+    const {user,token}=useAuth();
     const [members,setMembers]=useState<Membership[]>([]);
     const [loading,setLoading]=useState(true);
     const [showInviteModal,setShowInviteModal]=useState(false);
-
+    const [userId,setUserId]=useState<number>();
+    
     useEffect(()=>{
         loadMembers();
     },[id]);
@@ -24,6 +26,8 @@ export default function MembersPage(){
         setLoading(true);
         try{
             const data:any[]=await getMembers(id);
+            const userid:any=getUserIdFromToken(token);
+            setUserId(userid);
             setMembers(data ?? []);
         }catch(err:any){
             MessageBox({title:"Error",message:err.message,type:"error"});
@@ -34,7 +38,7 @@ export default function MembersPage(){
     const myMembership = members.find((m) => m.user.username === (user as any));
     const isAdmin = myMembership?.role === "admin";
     const handleRemove=async(targetUserId:number)=>{
-        const mssg=targetUserId===user?.id?"Leave this organization":"Remove this member";
+        const mssg=targetUserId===userId?" Leave this organization":" Remove this member";
         MessageBox({
         title: "Remove Membership",
         message: "Are you sure you want to"+mssg+" ?",
@@ -87,9 +91,9 @@ export default function MembersPage(){
                     <div style={{display:"flex",alignItems:"center"}}>
                         {!member.accepted && <span className="invite-pending-badge">Pending</span>}
                         <span className={`member-role ${member.role==="admin"?"admin":""}`}>{member.role}</span>
-                        {(isAdmin || member.userId===user?.id) && (
+                        {(isAdmin || member.userId===userId) && (
                             <button className="member-remove-btn" onClick={()=>handleRemove(member.userId)}>
-                                {member.userId===user?.id?"Leave":"Remove"}
+                                {member.userId===userId?"Leave":"Remove"}
                             </button>
                         )}
                     </div>
