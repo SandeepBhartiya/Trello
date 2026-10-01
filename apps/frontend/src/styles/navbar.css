@@ -80,3 +80,18 @@
   border-color: var(--color-error);
   background: rgba(220, 38, 38, 0.12);
 }
+
+.navbar-link {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 6px 4px;
+  transition: color 0.15s ease;
+}
+
+.navbar-link:hover {
+  color: var(--color-text);
+}

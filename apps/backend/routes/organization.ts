@@ -25,11 +25,7 @@ router.get("/",authMiddleWare,async(req,res)=>{
         if(organizations?.error){
             return res.status(500).send(organizations?.message);
         }
-        if(organizations?.length>0){
-            return res.status(200).send(organizations);
-        }else{
-            return res.status(200).send("User is not part of any organizations");
-        }
+        return res.status(200).send(organizations || []);
     }catch(err){
         return res.status(500).send("Failed to fetch organizations");
     }
