@@ -1,4 +1,5 @@
 import { useState } from "react";
+import {useLoading} from "../context/LoadingContext";
 import { inviteMember } from "../api/membership";
 import { validators, runValidation, type FieldErrors } from "../utils/validation";
 import { MessageBox } from "./MessageBox";
@@ -13,7 +14,7 @@ interface Props {
 export default function InviteMemberModal({ organizationId, onClose, onInvited }: Props) {
     const [email, setEmail] = useState("");
     const [fieldErrors, setFieldErrors] = useState<FieldErrors<InviteField>>({});
-    const [loading, setLoading] = useState(false);
+    const {loading, setLoading} = useLoading();
 
     const handleSumit=async(e:React.FormEvent)=>{
         e.preventDefault();
@@ -55,7 +56,7 @@ export default function InviteMemberModal({ organizationId, onClose, onInvited }
                     </div>
                     <div className="modal-actions">
                         <button type="button" className="modal-cancel" onClick={onClose}>Cancel</button>
-                        <button type="submit" className="modal-submit" disabled={loading}>{loading ? "Sending..." : "Send Invite"}</button>
+                        <button type="submit" className="modal-submit" disabled={loading}>Send Invite</button>
                     </div>
                 </form>
             </div>

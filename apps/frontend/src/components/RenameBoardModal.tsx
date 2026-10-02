@@ -1,4 +1,5 @@
 import { useState } from "react";
+import {useLoading} from "../context/LoadingContext";
 import { updateBoard } from "../api/board";
 import { validators, runValidation, type FieldErrors } from "../utils/validation";
 import type { Board } from "../types";
@@ -15,7 +16,7 @@ export default function RenameBoardModal({ board, onClose, onUpdated }: Props) {
   const [title, setTitle] = useState(board.title);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors<BoardField>>({});
   const [formError, setFormError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const {loading, setLoading} = useLoading();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,7 +66,7 @@ export default function RenameBoardModal({ board, onClose, onUpdated }: Props) {
               Cancel
             </button>
             <button type="submit" className="modal-submit" disabled={loading}>
-              {loading ? "Saving..." : "Save"}
+              Save
             </button>
           </div>
         </form>

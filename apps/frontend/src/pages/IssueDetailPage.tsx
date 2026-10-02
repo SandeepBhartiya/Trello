@@ -1,5 +1,6 @@
 import {useState,useEffect} from "react"
 import {useParams,useNavigate} from "react-router"
+import {useLoading} from "../context/LoadingContext"
 import {updateIssue,getIssue,deleteIssue} from "../api/issue"
 import {createComment,updateComment,deleteComment} from "../api/comment"
 import { getAvatarColor } from "../utils/avatarColor"
@@ -18,7 +19,7 @@ export default function IssueDetailPage(){
 
     const [issue,setIssue]=useState<Issue>();
     const [comments,setComments]=useState<Comment[]>([]);
-    const [loading,setLoading]=useState(true);
+    const {loading,setLoading}=useLoading();
 
     const [title,setTitle]=useState("");
     const [description,setDescription]=useState("");
@@ -58,27 +59,34 @@ export default function IssueDetailPage(){
 
     const handleTitleBlur=async()=>{
         if(!issue||title.trim()===issue.title)return;
+        setLoading(true);
         try{
             const update=await updateIssue(issue.id,title.trim(),description);
             setIssue(update);
         }catch(err:any){        
             MessageBox({title:"Error",message:err.message,type:"error"});
+        }finally{
+            setLoading(false);
         }
     }
 
     const handleDescriptionSave=async()=>{
+        setLoading(true);
         try{
             const updated=await updateIssue(Number(issue?.id),title,description);
             setIssue(updated);
             setEditingDesc(false);
         }catch(err:any){
             MessageBox({title:"Error",message:err.message,type:"error"});
+        }finally{
+            setLoading(false);
         }
     }
 
     const handleAddComment=async()=>{
         if(!newComment.trim()||!issue)return;
         setPostingComment(true);
+        setLoading(true);
         try {
             const comment=await createComment(issue.id,newComment);
             const formattedComment:any={
@@ -92,11 +100,13 @@ export default function IssueDetailPage(){
             MessageBox({title:"Error",message:err.message,type:"error"});
         }finally{
             setPostingComment(false);
+            setLoading(false);
         }
     }
 
     const handleUpdateComment=async(commentId:number)=>{
       if(!editContent.trim())return;
+      setLoading(true);
       try{
         const updated=await updateComment(commentId,editContent.trim());
         const formattedComment:any={
@@ -108,15 +118,20 @@ export default function IssueDetailPage(){
         setEditCommentId(null);
       }catch(err:any){
         MessageBox({title:"Error",message:err.message,type:"error"});
+      }finally{
+        setLoading(false);
       }
     }
 
     const handleDeleteComment=async(commentId:number)=>{
-        try{
+      setLoading(true);  
+      try{
             await deleteComment(commentId);
             setComments((prev)=>prev.filter((comment)=>comment.id!==commentId));
         }catch(err:any){
             MessageBox({title:"Error",message:err.message,type:"error"});
+        }finally{
+            setLoading(false);
         }
     }
 
@@ -127,6 +142,7 @@ export default function IssueDetailPage(){
         message: "Are you sure you want to delete this issue?",
         type: "confirm",
         onConfirm: async () => {
+          setLoading(true);
           try {
               await deleteIssue(Number(issueId));
               setIssue((prev:any)=>prev.filter((issue:any)=>issue.id!==Number(issueId)));
@@ -142,6 +158,8 @@ export default function IssueDetailPage(){
                   message: err.message || "Failed to delete issue",
                   type: "error"
                 });
+              }finally{
+                setLoading(false);
               }
             }
         });
@@ -153,6 +171,7 @@ export default function IssueDetailPage(){
 
     const handleAssign = async (assignUserId: number) => {
       if (!issue) return;
+      setLoading(true);
       try {
         const mapping = await assignUser(issue.id, assignUserId);
         const member = members.find((m) => Number(m.userId) === assignUserId);
@@ -163,11 +182,14 @@ export default function IssueDetailPage(){
           message: err.message || "Failed to assign user",
           type: "error"
         });
+      }finally{
+        setLoading(false);
       }
   };
 
     const handleUnassign = async (assignUserId: number) => {
       if (!issue) return;
+      setLoading(true);
       try {
         await unassignUser(issue.id, assignUserId);
         setAssignees((prev) => prev.filter((a) => Number(a.userId) !== Number(assignUserId)));
@@ -177,10 +199,11 @@ export default function IssueDetailPage(){
           message: err.message || "Failed to unassign user",
           type: "error"
         })
+      }finally{
+        setLoading(false);
       }
     };
     
-    if(loading) return <div className="board-loading">Loading issue...</div>;
     if (!issue) return null;
 
     return(

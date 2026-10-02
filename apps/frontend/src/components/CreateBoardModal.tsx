@@ -1,4 +1,5 @@
 import { useState } from "react";
+import {useLoading} from "../context/LoadingContext";
 import {createBoard} from "../api/board";
 import {validators,runValidation,type FieldErrors} from "../utils/validation";
 import {MessageBox} from "./MessageBox";
@@ -13,11 +14,10 @@ interface Props{
 }
 
 export default function CreateBoardModal({organizationId,onClose,onCreated}:Props){
-
     const [title,setTitle]=useState("");
     const [fieldErrors,setFieldErrors]=useState<FieldErrors<BoardField>>({});
     const [formError, setFormError] = useState("");
-    const [loading,setLoading]=useState(false);
+    const {loading,setLoading}=useLoading();
 
     const handleSubmit=async(e:React.FormEvent)=>{
         e.preventDefault();
@@ -69,7 +69,7 @@ export default function CreateBoardModal({organizationId,onClose,onCreated}:Prop
               Cancel
             </button>
             <button type="submit" className="modal-submit" disabled={loading}>
-              {loading ? "Creating..." : "Create"}
+              Create
             </button>
           </div>
         </form>

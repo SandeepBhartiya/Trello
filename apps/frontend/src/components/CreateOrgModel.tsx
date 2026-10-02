@@ -1,4 +1,5 @@
 import { useState } from "react";
+import {useLoading} from "../context/LoadingContext";
 import {createOrg} from "../api/organization";
 import { validators,runValidation,type FieldErrors } from "../utils/validation";
 import type { Org } from "../types";
@@ -17,7 +18,7 @@ export default function CreateOrgModal({onClose,onCreated}:Props){
     const [description,setDescription]=useState("");    
     const [fieldErrors,setFieldErrors]=useState<FieldErrors<OrgField>>({});
     const [formError, setFormError] = useState("");
-    const [loading,setLoading]=useState(false);
+    const {loading,setLoading}=useLoading();
 
     const handelSubmit=async(e:React.FormEvent)=>{
         e.preventDefault();
@@ -66,7 +67,7 @@ export default function CreateOrgModal({onClose,onCreated}:Props){
                     </div>
                     <div className="modal-actions">
                         <button type="button" className="modal-cancel" onClick={onClose}>Cancel</button>
-                        <button type="submit" className="modal-submit" disabled={loading}>{loading ? "Creating...":"Create"}</button>
+                        <button type="submit" className="modal-submit" disabled={loading}>Create</button>
                     </div>
                 </form>
 

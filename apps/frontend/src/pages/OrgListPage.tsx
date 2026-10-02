@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
+import { useLoading } from "../context/LoadingContext";
 import { getOrg, deleteOrg } from "../api/organization";
 import { getAvatarColor } from "../utils/avatarColor";
 import CreateOrgModal from "../components/CreateOrgModel";
@@ -9,7 +10,7 @@ import { MessageBox } from "../components/MessageBox";
 //need to add delete option and minor change in css when data is present
 export default function OrgListPage() {
   const [orgs, setOrgs] = useState<Org[]>([]);
-  const [loading, setLoading] = useState(true);
+  const {loading, setLoading} = useLoading();
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   const navigate = useNavigate();
@@ -35,15 +36,24 @@ export default function OrgListPage() {
   };
 
   const handleDeleteOrg = async (orgId: number) => {
-    try {
-      await deleteOrg(orgId);
-      MessageBox({title:"Success",message:"Organization deleted successfully",type:"success"});
-      await loadOrgs();
-    } catch (err: any) {
-      MessageBox({title:"Error",message:err.message||"Failed to delete organization",type:"error"});
-    }
+    MessageBox({
+      title:"Delete Organization",
+      message:"Are you sure you want to delete this organization?",
+      type:"confirm",
+      onConfirm: async () => {
+        setLoading(true);
+        try {
+          await deleteOrg(orgId);
+          MessageBox({title:"Success",message:"Organization deleted successfully",type:"success"});
+          await loadOrgs();
+        } catch (err: any) {
+          MessageBox({title:"Error",message:err.message||"Failed to delete organization",type:"error"});
+        }finally{
+          setLoading(false);
+        }      
+      }
+    });
   }
-  if (loading) return <div className="org-loading">Loading organizations...</div>;
 
   return (
     <div className="org-page">

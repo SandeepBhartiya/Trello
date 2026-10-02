@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate,useSearchParams, Link } from "react-router";
+import { useLoading } from "../context/LoadingContext";
 import {ToastContainer, toast} from "react-toastify";
 import { signin } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
@@ -14,7 +15,7 @@ export  default function SigninPage(){
     const [password, setPassword] = useState("");
     const [fieldErrors,setFieldErrors]=useState<FieldErrors<SigninField>>({});
     const [formError, setFormError] = useState("");
-    const [loading,setLoading]=useState(false);
+    const {loading,setLoading}=useLoading();
     
     const {login}=useAuth();
     const navigate=useNavigate();
@@ -79,7 +80,7 @@ export  default function SigninPage(){
                         {fieldErrors?.password && <div className="field-error">{fieldErrors.password}</div>}
                     </div>
                     <button type="submit" className="auth-submit" disabled={loading}>
-                        {loading ? "Signing in..." : "Sign in"}
+                       Sign in
                     </button>
                 </form>
                 <p className="auth-switch">

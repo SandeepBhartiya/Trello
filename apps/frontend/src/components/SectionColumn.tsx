@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useDroppable } from "@dnd-kit/core";
+import {useLoading} from "../context/LoadingContext";
 import { SortableContext,verticalListSortingStrategy } from "@dnd-kit/sortable";
 import IssueCard from "./IssueCard";
 import AddIssueForm from "./AddIssueForm";
 import { updateSection,deleteSection } from "../api/section";
 import type { Section,Issue } from "../types";
 import { MessageBox } from "./MessageBox";
-
 interface Props {
     section: Section;
     issues: Issue[];
@@ -21,6 +21,7 @@ export default function SectionColumn({section,issues,onAddIssue,onIssueClick,on
     const [adding,setAdding]=useState(false);
     const [editingTitle,setEditingTitle]=useState(false);
     const [title,setTitle]=useState(section.title);
+    const {loading,setLoading}=useLoading();
     const isSynthetic = section.id === -1;
 
     const {setNodeRef,isOver}=useDroppable({
@@ -30,6 +31,7 @@ export default function SectionColumn({section,issues,onAddIssue,onIssueClick,on
 
     const handelTitleSave=async()=>{
         setEditingTitle(false);
+        setLoading(true);
         if(!title.trim()||title.trim()===section.title){
             setTitle(section.title);
             return;
@@ -39,6 +41,8 @@ export default function SectionColumn({section,issues,onAddIssue,onIssueClick,on
             onSectionUpdate(updated);
         }catch(err){
             setTitle(section.title);
+        }finally{
+            setLoading(false);
         }
     }
 
@@ -48,6 +52,7 @@ export default function SectionColumn({section,issues,onAddIssue,onIssueClick,on
             message: "Are you sure you want to delete this section?",
             type: "confirm",
             onConfirm: async () => {
+                setLoading(true);
                 try {
                     await deleteSection(sectionid);
                     onSectionDelete(sectionid);
@@ -62,6 +67,8 @@ export default function SectionColumn({section,issues,onAddIssue,onIssueClick,on
                         message: err.message || "Failed to delete board",
                         type: "error"
                     });
+                }finally{
+                    setLoading(false);
                 }
             }
         });
@@ -72,8 +79,8 @@ export default function SectionColumn({section,issues,onAddIssue,onIssueClick,on
             title: "Delete Issue",
             message: "Are you sure you want to delete this issue?",
             type: "confirm",
-
             onConfirm: async () => {
+                setLoading(true);
                 try{
                     await onIssueDelete(issueid);
                     MessageBox({
@@ -87,6 +94,8 @@ export default function SectionColumn({section,issues,onAddIssue,onIssueClick,on
                         message: err.message || "Failed to delete issue",
                         type: "error"
                     })
+                }finally{
+                    setLoading(false);
                 }
             }
         })

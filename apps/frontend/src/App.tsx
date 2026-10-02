@@ -9,47 +9,50 @@ import KanbanBoardPage from "./pages/KanbanBoardPage";
 import IssueDetailPage from "./pages/IssueDetailPage";
 import MembersPage from "./pages/MembersPage";
 import AcceptInvitePage from "./pages/AcceptInvitePage";
+import { LoadingProvider } from "./context/LoadingContext";
 
 export default function App(){
   return(
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Navigate to="/organizations" replace />} />
-          <Route path="/signin" element={<SigninPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/organizations" element={
-            <ProtectedRoute>
-              <OrgListPage/>
-            </ProtectedRoute>
-          } />
-          <Route path="/organizations/:orgId/boards" element={
-            <ProtectedRoute>
-              <BoardListPage/>
-            </ProtectedRoute>
-          }/>
-          <Route path="/organizations/:orgId/boards/:boardId/lists" element={
-            <ProtectedRoute>
-              <KanbanBoardPage/>
-            </ProtectedRoute>  
-          }/>
-          <Route  path="/issue/:issueId" element={
-            <ProtectedRoute>
-              <IssueDetailPage/>
-            </ProtectedRoute>
-          }/>
-          <Route path="/organizations/:orgId/members" 
-            element={
+      <LoadingProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Navigate to="/organizations" replace />} />
+            <Route path="/signin" element={<SigninPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/organizations" element={
               <ProtectedRoute>
-                <MembersPage/>
+                <OrgListPage/>
               </ProtectedRoute>
-          }/>
-          <Route path="/accept-invite" 
-            element={
-              <AcceptInvitePage />
-          } />
-        </Routes>
-      </BrowserRouter>
+            } />
+            <Route path="/organizations/:orgId/boards" element={
+              <ProtectedRoute>
+                <BoardListPage/>
+              </ProtectedRoute>
+            }/>
+            <Route path="/organizations/:orgId/boards/:boardId/lists" element={
+              <ProtectedRoute>
+                <KanbanBoardPage/>
+              </ProtectedRoute>  
+            }/>
+            <Route  path="/issue/:issueId" element={
+              <ProtectedRoute>
+                <IssueDetailPage/>
+              </ProtectedRoute>
+            }/>
+            <Route path="/organizations/:orgId/members" 
+              element={
+                <ProtectedRoute>
+                  <MembersPage/>
+                </ProtectedRoute>
+            }/>
+            <Route path="/accept-invite" 
+              element={
+                <AcceptInvitePage />
+            } />
+          </Routes>
+        </BrowserRouter>
+      </LoadingProvider>
     </AuthProvider>
   )
 }

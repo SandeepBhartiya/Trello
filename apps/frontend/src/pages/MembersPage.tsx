@@ -1,5 +1,6 @@
 import { useState,useEffect } from "react";
 import {useParams} from "react-router";
+import { useLoading } from "../context/LoadingContext";
 import { getMembers,removeMembership } from "../api/membership";
 import { MessageBox } from "../components/MessageBox";
 import {useAuth} from "../context/AuthContext"
@@ -14,7 +15,7 @@ export default function MembersPage(){
     const id=Number(orgId);
     const {user,token}=useAuth();
     const [members,setMembers]=useState<Membership[]>([]);
-    const [loading,setLoading]=useState(true);
+    const {loading,setLoading}=useLoading();
     const [showInviteModal,setShowInviteModal]=useState(false);
     const [userId,setUserId]=useState<number>();
     
@@ -38,33 +39,32 @@ export default function MembersPage(){
     const myMembership = members.find((m) => m.user.username === (user as any));
     const isAdmin = myMembership?.role === "admin";
     const handleRemove=async(targetUserId:number)=>{
-        const mssg=targetUserId===userId?" Leave this organization":" Remove this member";
+        const mssg=targetUserId===userId?" Leave this organization":" Remove this member";        
         MessageBox({
         title: "Remove Membership",
         message: "Are you sure you want to"+mssg+" ?",
         type: "confirm",
         onConfirm: async () => {
           try {
-              await removeMembership(id,Number(targetUserId));
-              setMembers((prev:any)=>prev.filter((m:any)=>m.userId!==targetUserId));
-              MessageBox({
-                title: "Success",
-                message: "Member remove successfully",
-                type: "success"
-              });
+                setLoading(true);
+                await removeMembership(id,Number(targetUserId));
+                setMembers((prev:any)=>prev.filter((m:any)=>m.userId!==targetUserId));
+                MessageBox({
+                    title: "Success",
+                    message: `${mssg} successfully`,
+                    type: "success"
+                });
             } catch (err: any) {
                 MessageBox({
                   title: "Error",
-                  message: err.message || "Failed to remove member",
+                  message: err.message || `Failed to ${mssg}`,
                   type: "error"
                 });
-              }
+            }finally{
+                    setLoading(false);
+                }
             }
         });
-    }
-
-    if(loading){
-        return <div className="board-loading">Loading...</div>;
     }
 
     return(

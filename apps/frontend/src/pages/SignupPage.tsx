@@ -1,5 +1,6 @@
 import {useState} from "react";
 import {useNavigate,Link,useSearchParams} from "react-router";
+import {useLoading} from "../context/LoadingContext";
 import {ToastContainer, toast} from "react-toastify";
 import { signup } from "../api/auth";
 import {useAuth} from "../context/AuthContext";
@@ -14,7 +15,7 @@ export default function SignupPage() {
     const [password, setPassword] = useState("");
     const [fieldErrors,setFieldErrors]=useState<FieldErrors<SignupField>>({});
     const [formError, setFormError] = useState("");
-    const [loading,setLoading]=useState(false);
+    const {loading,setLoading}=useLoading();
 
     const {login}=useAuth();
     const navigate=useNavigate();
@@ -91,7 +92,7 @@ export default function SignupPage() {
                         {fieldErrors?.password && <div className="field-error">{fieldErrors.password}</div>}
                     </div>
                     <button type="submit" className="auth-submit" disabled={loading}>
-                        {loading ? "Signing up..." : "Sign up"}
+                        Sign up
                     </button>
                 </form>
                 <p>Already have an account? 

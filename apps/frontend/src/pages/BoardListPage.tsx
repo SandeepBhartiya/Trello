@@ -1,5 +1,6 @@
 import {useEffect, useState} from "react";
 import {useNavigate,useParams} from "react-router";
+import { useLoading } from "../context/LoadingContext";
 import {getBoards,deleteBoards} from "../api/board";
 import {MessageBox} from "../components/MessageBox";
 import CreateBoardModal from "../components/CreateBoardModal";
@@ -12,7 +13,7 @@ export default function BoardListPage(){
     const organizationId=Number(orgId);
     const [boards,setBoards]=useState<Board[]>([]);
     const [selectedBoard,setSelectedBoard]=useState<Board|null>(null);
-    const [loading,setLoading]=useState(true);
+    const {loading,setLoading}=useLoading();
     const [showCreateModal,setShowCreateModal]=useState(false);
     const [showRenameModal,setShowRenameModal]=useState(false);
     const [userRole,setUserRole]=useState("");
@@ -46,6 +47,7 @@ export default function BoardListPage(){
         message: "Are you sure you want to delete this board?",
         type: "confirm",
         onConfirm: async () => {
+          setLoading(true);
           try {
             await deleteBoards(boardId);
             MessageBox({
@@ -60,13 +62,11 @@ export default function BoardListPage(){
               message: err.message || "Failed to delete board",
               type: "error"
             });
+          }finally{
+            setLoading(false);
           }
         }
       });
-    }
-
-    if(loading){
-      return <div className="board-loading">Loading...</div>;
     }
 
     return(

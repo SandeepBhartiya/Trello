@@ -1,5 +1,6 @@
 import { useState,useEffect } from "react";
 import {useNavigate,useParams} from "react-router";
+import { useLoading } from "../context/LoadingContext";
 import { 
     DndContext,
     DragOverlay,
@@ -20,7 +21,7 @@ import "../styles/kanban.css";
 export default function KanbanBoardPage(){
     const [sections,setSections]=useState<Section[]>([]);
     const [issues,setIssues]=useState<Issue[]>([]);
-    const [loading,setLoading]=useState(true);
+    const {loading,setLoading}=useLoading();
     const [addingSection,setAddingSection]=useState(false);
     const [newSectionTitle,setNewSectionTitle]=useState("");
     const [activeIssue,setActiveIssue]=useState<Issue|null>(null);
@@ -56,6 +57,7 @@ export default function KanbanBoardPage(){
 
     const handleAddSection=async()=>{
         if(!newSectionTitle.trim())return;
+        setLoading(true);
         try{
             const section:any=await createSection(newSectionTitle.trim(),id);
             setSections((prev)=>[...prev,section?.data]);
@@ -64,26 +66,33 @@ export default function KanbanBoardPage(){
             MessageBox({title:"Success",message:"Section created successfully",type:"success"});
         }catch(err:any){
             MessageBox({title:"Error",message:err.message,type:"error"});
+        }finally{
+            setLoading(false);
         }
     }
 
     const handleAddIssue=async(sectionId:number,title:string)=>{//in this we don't add desc bc it happen in issue form
+        setLoading(true);
         try{
             const issue=await createIssue(id,sectionId,title);
             setIssues((prev)=>[...prev,issue]);
             MessageBox({title:"Success",message:"Issue created successfully",type:"success"});
         }catch(err:any){
             MessageBox({title:"Error",message:err.message,type:"error"});
+        }finally{
+            setLoading(false);
         }
     }
 
     const handleIssueDelete=async(issueId:number)=>{ //need to check as issue form is not created now
+        setLoading(true);
         try{
             await deleteIssue(issueId);
             setIssues((prev)=>prev.filter((i)=>i.id!==issueId));
-            // MessageBox({title:"Success",message:"Issue deleted successfully",type:"success"});
         }catch(err:any){
             MessageBox({title:"Error",message:err.message,type:"error"});
+        }finally{
+            setLoading(false);
         }
     }
 
@@ -92,10 +101,16 @@ export default function KanbanBoardPage(){
     }
 
     const handleSectionDelete=async(sectionId:number)=>{
-        setSections((prev)=>prev.filter((section)=>section.id!==sectionId));
-        setIssues((prev)=> prev.map((i) => (i.sectionId === sectionId ? { ...i, sectionId: null } : i)));
+        setLoading(true);
+        try{
+            setSections((prev)=>prev.filter((section)=>section.id!==sectionId));
+            setIssues((prev)=> prev.map((i) => (i.sectionId === sectionId ? { ...i, sectionId: null } : i)));
+        }catch(err:any){
+            
+        }finally{
+            setLoading(false);
+        }
     }
-
 
     const handleIssueClick=(issue:Issue)=>{
         navigate(`/issue/${issue.id}`);
@@ -144,7 +159,6 @@ export default function KanbanBoardPage(){
         }
   };
 
-    if(loading)return(<div className="board-loading">Loading...</div>);
     return(
         <div className="kanban-page">
             <div className="kanban-header">
