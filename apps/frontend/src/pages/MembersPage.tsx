@@ -68,9 +68,9 @@ export default function MembersPage(){
     }
 
     return(
-        <div className="members-page">
-            <div className="members-header">
-                <h1>Members</h1>
+        <div className="page-container page-container--narrow">
+            <div className="page-header">
+                <h1 className="page-title">Members</h1>
                 {isAdmin && (
                     <button className="org-create-btn" onClick={()=>setShowInviteModal(true)}>
                         +Invite Member

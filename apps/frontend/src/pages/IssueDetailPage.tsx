@@ -207,7 +207,7 @@ export default function IssueDetailPage(){
     if (!issue) return null;
 
     return(
-    <div className="issue-page">
+    <div className="page-container page-container--narrow issue-page">
       <button className="issue-back" onClick={() => navigate(-1)}>← Back to board</button>
       <input
         className="issue-title-input"

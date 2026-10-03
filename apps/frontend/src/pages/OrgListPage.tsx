@@ -56,33 +56,25 @@ export default function OrgListPage() {
   }
 
   return (
-    <div className="org-page">
-      <div className="org-page-header">
-        <h1 className="body-wrapper">Your organizations</h1>
-        {orgs.length>0 &&(
-        <button className="org-create-btn" onClick={() => setShowCreateModal(true)}>
-          + New organization
-        </button>)}
-      </div>
-
+    <div className="page-container">
       {orgs?.length === 0 ? (
-        <div className="org-empty-wrapper">
-          <div className="body-wrapper">
-            <div className="org-empty-icon">🗂️</div>
-          </div>
-          <div className="org-empty-title">No organizations yet</div>
-          <div className="org-empty-subtitle">
+        <div className="empty-state">
+            <div className="empty-state-icon">🗂️</div>
+          {/* <div className="body-wrapper">
+          </div> */}
+          <div className="empty-state-title">No organizations yet</div>
+          <div className="empty-state-subtitle">
             You're not part of any organization yet. Create one to get started.
           </div>
-          <div className="body-wrapper">
-          <button className="org-create-btn"  onClick={() => setShowCreateModal(true)}>
+          <button className="btn-primary"  onClick={() => setShowCreateModal(true)}>
             + New organization
           </button>
+          {/* <div className="body-wrapper">
 
-          </div>
+          </div> */}
         </div>
       ) : (
-        <div className="org-list">
+        <div className="card-grid">
           {orgs?.map((org) => (
             <div key={org.id} className="org-card" onClick={() => handleOrgClick(org.id)}>
               <div className="org-card-top" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

@@ -70,20 +70,20 @@ export default function BoardListPage(){
     }
 
     return(
-      <div className="board-page">
+      <div className="page-container">
         {boards.length === 0 ? (
-          <div className="board-empty-wrap">
-            <div className="board-empty-icon">📋</div>
-            <div className="board-empty-title">No boards yet</div>
-            <div className="board-empty-subtitle">
+          <div className="empty-state">
+            <div className="empty-state-icon">📋</div>
+            <div className="empty-state-title">No boards yet</div>
+            <div className="empty-state-subtitle">
               Create a board to start organizing work into sections and issues.
             </div>
-            <button className="org-create-btn" onClick={() => setShowCreateModal(true)}>
+            <button className="btn-primary" onClick={() => setShowCreateModal(true)}>
               + New board
             </button>
           </div>
         ) : (
-          <div className="board-list">
+          <div className="card-grid">
             {boards.map((board) => (
               <div key={board.id} className="board-card" onClick={() => handleBoardClick(board.id)}>
                 <div className="board-card-title">{board.title}</div>

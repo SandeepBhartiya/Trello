@@ -162,7 +162,7 @@ export default function KanbanBoardPage(){
     return(
         <div className="kanban-page">
             <div className="kanban-header">
-                <h1>Board</h1>
+                <h1 className="page-title">Board</h1>
             </div>
             <DndContext
                 sensors={sensors}
