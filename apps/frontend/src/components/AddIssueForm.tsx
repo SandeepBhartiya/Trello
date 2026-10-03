@@ -24,7 +24,7 @@ export default function AddIssueForm({onAdd,onCancel}:Props){
                 value={title} 
                 onChange={(e)=>setTitle(e.target.value)}
                 onKeyDown={(e)=>{
-                    if(e.key==="Enter" && e.shiftKey){
+                    if(e.key==="Enter"){
                         e.preventDefault();
                         submit();
                     }

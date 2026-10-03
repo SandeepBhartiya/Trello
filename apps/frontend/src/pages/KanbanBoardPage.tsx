@@ -203,7 +203,7 @@ export default function KanbanBoardPage(){
                                 value={newSectionTitle}
                                 onChange={(e)=>setNewSectionTitle(e.target.value)}
                                 onKeyDown={(e)=>{
-                                    if(e.key==="Enter" && e.shiftKey){
+                                    if(e.key==="Enter"){
                                         e.preventDefault();
                                         handleAddSection();
                                     }

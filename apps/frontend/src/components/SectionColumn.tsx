@@ -113,7 +113,7 @@ export default function SectionColumn({section,issues,onAddIssue,onIssueClick,on
                         onChange={(e)=>setTitle(e.target.value)}
                         onBlur={handelTitleSave}
                         onKeyDown={(e)=>{
-                            if(e.key==="Enter" && e.shiftKey){
+                            if(e.key==="Enter"){
                                 handelTitleSave();
                             }
                             if(e.key==="Escape"){
