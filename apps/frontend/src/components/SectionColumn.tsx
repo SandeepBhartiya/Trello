@@ -31,12 +31,11 @@ export default function SectionColumn({section,issues,onAddIssue,onIssueClick,on
 
     const handelTitleSave=async()=>{
         setEditingTitle(false);
-        setLoading(true);
         if(!title.trim()||title.trim()===section.title){
             setTitle(section.title);
-            setLoading(false);
             return;
         }
+        setLoading(true);
         try{
             const updated:any=await updateSection(section.id,title.trim());
             onSectionUpdate(updated);

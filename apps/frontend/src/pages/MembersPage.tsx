@@ -45,8 +45,8 @@ export default function MembersPage(){
         message: "Are you sure you want to"+mssg+" ?",
         type: "confirm",
         onConfirm: async () => {
+            setLoading(true);
           try {
-                setLoading(true);
                 await removeMembership(id,Number(targetUserId));
                 setMembers((prev:any)=>prev.filter((m:any)=>m.userId!==targetUserId));
                 MessageBox({
