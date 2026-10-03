@@ -34,6 +34,7 @@ export default function SectionColumn({section,issues,onAddIssue,onIssueClick,on
         setLoading(true);
         if(!title.trim()||title.trim()===section.title){
             setTitle(section.title);
+            setLoading(false);
             return;
         }
         try{
