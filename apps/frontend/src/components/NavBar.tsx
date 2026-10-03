@@ -25,7 +25,7 @@ export default function Navbar() {
         <OrgSwitcher />
       </div>
 
-      <div className="navbar-user">
+      <div className="navbar-right">
          {orgId && (
           <button
             className="navbar-link"
@@ -34,13 +34,15 @@ export default function Navbar() {
             Members
           </button>
         )}
-        <div className="navbar-avatar" style={{ background: getAvatarColor(JSON.stringify(username)) }}>
-          {username?.slice(0, 2)}
+        <div className="navbar-user">
+          <div className="navbar-avatar" style={{ background: getAvatarColor(JSON.stringify(username)) }}>
+            {username?.slice(0, 2)}
+          </div>
+          <span className="navbar-username">{username}</span>
+          <button className="navbar-logout" onClick={handleLogout}>
+            Logout
+          </button>
         </div>
-        <span className="navbar-username">{username}</span>
-        <button className="navbar-logout" onClick={handleLogout}>
-          Logout
-        </button>
       </div>
     </nav>
   );
