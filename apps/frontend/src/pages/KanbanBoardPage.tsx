@@ -10,12 +10,13 @@ import {
     useSensors,
     type DragStartEvent,
     type DragEndEvent } from "@dnd-kit/core";
+import {ToastContainer, toast} from "react-toastify";
 import { getSections,createSection } from "../api/section";
 import { getIssues,createIssue, deleteIssue,moveIssue } from "../api/issue";
 import SectionColumn from "../components/SectionColumn";
 import IssueCard from "../components/IssueCard";
 import type { Section,Issue } from "../types";
-import { MessageBox } from "../components/MessageBox";
+import "react-toastify/dist/ReactToastify.css";
 import "../styles/kanban.css";
 
 export default function KanbanBoardPage(){
@@ -46,10 +47,9 @@ export default function KanbanBoardPage(){
             const issueData:Issue[]=await getIssues(id);
             setSections(sectionData??[]);
             setIssues(issueData??[]);
-            MessageBox({title:"Success",message:"Board loaded successfully",type:"success"});
         }catch(err:any)
         {
-            MessageBox({title:"Error",message:err.message,type:"error"});
+            toast.error(err.message||"Failed to load boards");
         }finally{
             setLoading(false);
         }
@@ -63,9 +63,9 @@ export default function KanbanBoardPage(){
             setSections((prev)=>[...prev,section?.data]);
             setNewSectionTitle("");
             setAddingSection(false);
-            MessageBox({title:"Success",message:"Section created successfully",type:"success"});
+            toast.success("Section created successfully");
         }catch(err:any){
-            MessageBox({title:"Error",message:err.message,type:"error"});
+            toast.error(err.message||"Failed to create section");
         }finally{
             setLoading(false);
         }
@@ -76,9 +76,9 @@ export default function KanbanBoardPage(){
         try{
             const issue=await createIssue(id,sectionId,title);
             setIssues((prev)=>[...prev,issue]);
-            MessageBox({title:"Success",message:"Issue created successfully",type:"success"});
+            toast.success("Issue created successfully");
         }catch(err:any){
-            MessageBox({title:"Error",message:err.message,type:"error"});
+            toast.error(err.message||"Failed to create issue");
         }finally{
             setLoading(false);
         }
@@ -89,8 +89,9 @@ export default function KanbanBoardPage(){
         try{
             await deleteIssue(issueId);
             setIssues((prev)=>prev.filter((i)=>i.id!==issueId));
+            toast.success("Issue deleted successfully");
         }catch(err:any){
-            MessageBox({title:"Error",message:err.message,type:"error"});
+            toast.error(err.message||"Failed to delete issue");
         }finally{
             setLoading(false);
         }
@@ -105,8 +106,9 @@ export default function KanbanBoardPage(){
         try{
             setSections((prev)=>prev.filter((section)=>section.id!==sectionId));
             setIssues((prev)=> prev.map((i) => (i.sectionId === sectionId ? { ...i, sectionId: null } : i)));
+            toast.success("Section deleted successfully");
         }catch(err:any){
-            
+            toast.error(err.message||"Failed to delete section");
         }finally{
             setLoading(false);
         }
@@ -154,13 +156,14 @@ export default function KanbanBoardPage(){
         try {
             await moveIssue(issueId, targetSectionId);
         } catch (err: any) {
-            setIssues(previousIssues); // revert on failure
-            MessageBox({title:"Error",message:err.message,type:"error"});
+            setIssues(previousIssues);
+            toast.error(err.message || "Failed to move issue");
         }
   };
 
     return(
         <div className="kanban-page">
+            <ToastContainer position="top-right" autoClose={4000} />
             <div className="kanban-header">
                 <h1 className="page-title">Board</h1>
             </div>

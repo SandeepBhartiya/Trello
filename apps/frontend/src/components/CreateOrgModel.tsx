@@ -3,7 +3,6 @@ import {useLoading} from "../context/LoadingContext";
 import {createOrg} from "../api/organization";
 import { validators,runValidation,type FieldErrors } from "../utils/validation";
 import type { Org } from "../types";
-import { MessageBox } from "./MessageBox";
 import { toast } from "react-toastify";
 
 type OrgField="name";
@@ -32,7 +31,7 @@ export default function CreateOrgModal({onClose,onCreated}:Props){
         setLoading(true);
         try{
             const org:any=await createOrg(name,description);
-            MessageBox({title:"Success",message:"Organization created successfully",type:"success"});
+            toast.success("Organization created successfully");
             onCreated(org);
             onClose();
         }catch(err:any){

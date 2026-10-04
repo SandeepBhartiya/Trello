@@ -1,8 +1,9 @@
 import { useState } from "react";
 import {useLoading} from "../context/LoadingContext";
+import { toast} from "react-toastify";
 import { inviteMember } from "../api/membership";
 import { validators, runValidation, type FieldErrors } from "../utils/validation";
-import { MessageBox } from "./MessageBox";
+import "react-toastify/dist/ReactToastify.css";
 
 type InviteField = "email";
 interface Props {
@@ -26,11 +27,11 @@ export default function InviteMemberModal({ organizationId, onClose, onInvited }
         setLoading(true);
         try{
             await inviteMember(organizationId,email);
-            MessageBox({title:"Success",message:"Member invited successfully",type:"success"});
+            toast.success("Member invited successfully");
             onInvited();
             onClose();
         }catch(err:any){
-            MessageBox({title:"Error",message:err.message,type:"error"});
+            toast.error(err.message || "Failed to invite member");
         }finally{
             setLoading(false);
         }

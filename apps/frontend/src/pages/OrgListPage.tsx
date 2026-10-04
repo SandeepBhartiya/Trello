@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
+import {ToastContainer,  toast } from "react-toastify";
 import { useLoading } from "../context/LoadingContext";
 import { getOrg, deleteOrg } from "../api/organization";
 import { getAvatarColor } from "../utils/avatarColor";
@@ -7,7 +8,8 @@ import CreateOrgModal from "../components/CreateOrgModel";
 import type { Org } from "../types";
 import "../styles/organization.css";
 import { MessageBox } from "../components/MessageBox";
-//need to add delete option and minor change in css when data is present
+import "react-toastify/dist/ReactToastify.css";
+
 export default function OrgListPage() {
   const [orgs, setOrgs] = useState<Org[]>([]);
   const {loading, setLoading} = useLoading();
@@ -25,7 +27,7 @@ export default function OrgListPage() {
       const data:any = await getOrg();
       setOrgs(data??[]);
     } catch (err: any) {
-      MessageBox({title:"Error",message:err.message,type:"error"});
+      toast.error(err.message || "Failed to load organizations");
     } finally {
       setLoading(false);
     }
@@ -44,10 +46,10 @@ export default function OrgListPage() {
         setLoading(true);
         try {
           await deleteOrg(orgId);
-          MessageBox({title:"Success",message:"Organization deleted successfully",type:"success"});
+          toast.success("Organization deleted successfully");
           await loadOrgs();
         } catch (err: any) {
-          MessageBox({title:"Error",message:err.message||"Failed to delete organization",type:"error"});
+          toast.error(err.message || "Failed to delete organization");
         }finally{
           setLoading(false);
         }      
@@ -57,6 +59,7 @@ export default function OrgListPage() {
 
   return (
     <div className="page-container">
+      <ToastContainer position="top-right" autoClose={4000} />
       {orgs?.length === 0 ? (
         <div className="empty-state">
             <div className="empty-state-icon">🗂️</div>

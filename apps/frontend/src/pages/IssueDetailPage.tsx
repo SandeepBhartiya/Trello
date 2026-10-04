@@ -1,6 +1,7 @@
 import {useState,useEffect} from "react"
 import {useParams,useNavigate} from "react-router"
 import {useLoading} from "../context/LoadingContext"
+import {ToastContainer, toast} from "react-toastify";
 import {updateIssue,getIssue,deleteIssue} from "../api/issue"
 import {createComment,updateComment,deleteComment} from "../api/comment"
 import { getAvatarColor } from "../utils/avatarColor"
@@ -9,6 +10,7 @@ import type {Issue,Comment,IssueMapping} from "../types"
 import { MessageBox } from "../components/MessageBox"
 import { assignUser,unassignUser } from "../api/issue"
 import {getMembers} from "../api/membership"
+import "react-toastify/dist/ReactToastify.css";
 import "../styles/issue.css"
 
 export default function IssueDetailPage(){
@@ -51,7 +53,7 @@ export default function IssueDetailPage(){
                 setMembers((members ?? []).filter((m: any) => m.accepted));
             }
         }catch(err:any){
-            MessageBox({title:"Error",message:err.message,type:"error"});
+            toast.error(err.message || "Failed to load issue");
         }finally{
             setLoading(false);
         }
@@ -64,7 +66,7 @@ export default function IssueDetailPage(){
             const update=await updateIssue(issue.id,title.trim(),description);
             setIssue(update);
         }catch(err:any){        
-            MessageBox({title:"Error",message:err.message,type:"error"});
+            toast.error(err.message || "Failed to update title");
         }finally{
             setLoading(false);
         }
@@ -77,7 +79,7 @@ export default function IssueDetailPage(){
             setIssue(updated);
             setEditingDesc(false);
         }catch(err:any){
-            MessageBox({title:"Error",message:err.message,type:"error"});
+            toast.error(err.message || "Failed to update description");
         }finally{
             setLoading(false);
         }
@@ -95,9 +97,10 @@ export default function IssueDetailPage(){
                }
             };
             setComments((prev) => [...prev, { ...comment, ...formattedComment }]);
+            toast.success("Comment added successfully");
             setNewComment("");
         } catch (err:any) {
-            MessageBox({title:"Error",message:err.message,type:"error"});
+            toast.error(err.message || "Failed to add comment");
         }finally{
             setPostingComment(false);
             setLoading(false);
@@ -115,9 +118,10 @@ export default function IssueDetailPage(){
           }
         };
         setComments((prev)=>prev.map((comment:any)=>comment.id===commentId?{...updated,...formattedComment}:comment));
+        toast.success("Comment updated successfully");
         setEditCommentId(null);
       }catch(err:any){
-        MessageBox({title:"Error",message:err.message,type:"error"});
+        toast.error(err.message || "Failed to update comment");
       }finally{
         setLoading(false);
       }
@@ -128,8 +132,9 @@ export default function IssueDetailPage(){
       try{
             await deleteComment(commentId);
             setComments((prev)=>prev.filter((comment)=>comment.id!==commentId));
+            toast.success("Comment deleted successfully");
         }catch(err:any){
-            MessageBox({title:"Error",message:err.message,type:"error"});
+            toast.error(err.message || "Failed to delete comment");
         }finally{
             setLoading(false);
         }
@@ -146,18 +151,10 @@ export default function IssueDetailPage(){
           try {
               await deleteIssue(Number(issueId));
               setIssue((prev:any)=>prev.filter((issue:any)=>issue.id!==Number(issueId)));
-              MessageBox({
-                title: "Success",
-                message: "Issue deleted successfully",
-                type: "success"
-              });
+              toast.success("Issue deleted successfully");
               navigate(-1);
             } catch (err: any) {
-                MessageBox({
-                  title: "Error",
-                  message: err.message || "Failed to delete issue",
-                  type: "error"
-                });
+              toast.error(err.message || "Failed to delete issue");
               }finally{
                 setLoading(false);
               }
@@ -177,11 +174,7 @@ export default function IssueDetailPage(){
         const member = members.find((m) => Number(m.userId) === assignUserId);
         setAssignees((prev) => [...prev, { ...mapping, user: member?.user }]);
       } catch (err: any) {
-        MessageBox({
-          title: "Error",
-          message: err.message || "Failed to assign user",
-          type: "error"
-        });
+        toast.error(err.message || "Failed to assign user");
       }finally{
         setLoading(false);
       }
@@ -194,11 +187,7 @@ export default function IssueDetailPage(){
         await unassignUser(issue.id, assignUserId);
         setAssignees((prev) => prev.filter((a) => Number(a.userId) !== Number(assignUserId)));
       } catch (err: any) {
-        MessageBox({
-          title: "Error",
-          message: err.message || "Failed to unassign user",
-          type: "error"
-        })
+        toast.error(err.message || "Failed to unassign user");
       }finally{
         setLoading(false);
       }
@@ -208,6 +197,7 @@ export default function IssueDetailPage(){
 
     return(
     <div className="page-container page-container--narrow issue-page">
+      <ToastContainer position="top-right" autoClose={4000} />
       <button className="issue-back" onClick={() => navigate(-1)}>← Back to board</button>
       <input
         className="issue-title-input"

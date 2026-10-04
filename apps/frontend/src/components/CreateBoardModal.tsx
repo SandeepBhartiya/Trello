@@ -1,8 +1,8 @@
 import { useState } from "react";
+import { toast } from "react-toastify";
 import {useLoading} from "../context/LoadingContext";
 import {createBoard} from "../api/board";
 import {validators,runValidation,type FieldErrors} from "../utils/validation";
-import {MessageBox} from "./MessageBox";
 import type { Board } from "../types";
 
 type BoardField="title";
@@ -30,14 +30,12 @@ export default function CreateBoardModal({organizationId,onClose,onCreated}:Prop
         if(Object.keys(errors).length>0)return;
         setLoading(true);
         try{
-            console.log("organizationId",organizationId);
-            console.log("title",title);
             const board:any=await createBoard(title,organizationId);
-            MessageBox({title:"Success",message:"Board created successfully",type:"success"});
+            toast.success("Board created successfully");
             onCreated(board);
             onClose();
         }catch(err:any){
-            MessageBox({title:"Error",message:err.message,type:"error"});
+            toast.error(err.message || "Failed to create board");
         }finally{
             setLoading(false);
         }
@@ -47,7 +45,6 @@ export default function CreateBoardModal({organizationId,onClose,onCreated}:Prop
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <h2>Create board</h2>
-
         {formError && <div className="form-error">{formError}</div>}
 
         <form onSubmit={handleSubmit} noValidate>

@@ -1,11 +1,13 @@
 import {useEffect, useState} from "react";
 import {useNavigate,useParams} from "react-router";
 import { useLoading } from "../context/LoadingContext";
+import {ToastContainer, toast} from "react-toastify";
 import {getBoards,deleteBoards} from "../api/board";
 import {MessageBox} from "../components/MessageBox";
 import CreateBoardModal from "../components/CreateBoardModal";
 import RenameBoardModal from "../components/RenameBoardModal";
 import type { Board } from "../types";
+import "react-toastify/dist/ReactToastify.css";
 import "../styles/board.css";
 
 export default function BoardListPage(){
@@ -50,18 +52,10 @@ export default function BoardListPage(){
           setLoading(true);
           try {
             await deleteBoards(boardId);
-            MessageBox({
-              title: "Success",
-              message: "Board deleted successfully",
-              type: "success"
-            });
+            toast.success("Board deleted successfully");
             await loadBoards();
           } catch (err: any) {
-            MessageBox({
-              title: "Error",
-              message: err.message || "Failed to delete board",
-              type: "error"
-            });
+           toast.error(err.message || "Failed to delete board");
           }finally{
             setLoading(false);
           }
@@ -71,6 +65,7 @@ export default function BoardListPage(){
 
     return(
       <div className="page-container">
+        <ToastContainer position="top-right" autoClose={4000} />
         {boards.length === 0 ? (
           <div className="empty-state">
             <div className="empty-state-icon">📋</div>

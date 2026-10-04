@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useDroppable } from "@dnd-kit/core";
+import {toast} from "react-toastify";
 import {useLoading} from "../context/LoadingContext";
 import { SortableContext,verticalListSortingStrategy } from "@dnd-kit/sortable";
 import IssueCard from "./IssueCard";
@@ -38,8 +39,10 @@ export default function SectionColumn({section,issues,onAddIssue,onIssueClick,on
         setLoading(true);
         try{
             const updated:any=await updateSection(section.id,title.trim());
+            toast.success("Title updated successfully");
             onSectionUpdate(updated);
-        }catch(err){
+        }catch(err:any){
+            toast.error(err.message||"Failed to update Title");
             setTitle(section.title);
         }finally{
             setLoading(false);
@@ -56,17 +59,9 @@ export default function SectionColumn({section,issues,onAddIssue,onIssueClick,on
                 try {
                     await deleteSection(sectionid);
                     onSectionDelete(sectionid);
-                    MessageBox({
-                        title: "Success",
-                        message: "Section deleted successfully",
-                        type: "success"
-                    });
+                    toast.success("Section deleted successfully");
                 }catch (err: any) {
-                    MessageBox({
-                        title: "Error",
-                        message: err.message || "Failed to delete board",
-                        type: "error"
-                    });
+                   toast.error(err.message || "Failed to delete section");
                 }finally{
                     setLoading(false);
                 }
@@ -83,17 +78,9 @@ export default function SectionColumn({section,issues,onAddIssue,onIssueClick,on
                 setLoading(true);
                 try{
                     await onIssueDelete(issueid);
-                    MessageBox({
-                        title: "Success",
-                        message: "Issue deleted successfully",
-                        type: "success"
-                    })
+                    toast.success("Issue deleted successfully");
                 }catch(err:any){
-                    MessageBox({
-                        title: "Error",
-                        message: err.message || "Failed to delete issue",
-                        type: "error"
-                    })
+                    toast.error(err.message||"Failed to delete issue");
                 }finally{
                     setLoading(false);
                 }

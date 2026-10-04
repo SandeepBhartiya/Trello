@@ -10,12 +10,14 @@ import IssueDetailPage from "./pages/IssueDetailPage";
 import MembersPage from "./pages/MembersPage";
 import AcceptInvitePage from "./pages/AcceptInvitePage";
 import { LoadingProvider } from "./context/LoadingContext";
+import { ToastContainer } from "react-toastify";
 
 export default function App(){
   return(
     <AuthProvider>
       <LoadingProvider>
         <BrowserRouter>
+         <ToastContainer position="top-right" autoClose={4000} />
           <Routes>
             <Route path="/" element={<Navigate to="/organizations" replace />} />
             <Route path="/signin" element={<SigninPage />} />

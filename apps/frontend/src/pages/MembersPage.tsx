@@ -9,6 +9,8 @@ import type { Membership } from "../types";
 import "../styles/members.css";
 import { getAvatarColor } from "../utils/avatarColor";
 import { getUserIdFromToken } from "../utils/jwt";
+import {ToastContainer,  toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function MembersPage(){
     const {orgId}=useParams();
@@ -31,7 +33,7 @@ export default function MembersPage(){
             setUserId(userid);
             setMembers(data ?? []);
         }catch(err:any){
-            MessageBox({title:"Error",message:err.message,type:"error"});
+            toast.error(err.message || "Failed to load members");
         }finally{
             setLoading(false);
         }
@@ -49,17 +51,9 @@ export default function MembersPage(){
           try {
                 await removeMembership(id,Number(targetUserId));
                 setMembers((prev:any)=>prev.filter((m:any)=>m.userId!==targetUserId));
-                MessageBox({
-                    title: "Success",
-                    message: `${mssg} successfully`,
-                    type: "success"
-                });
+                toast.success(`${mssg} successfully`);
             } catch (err: any) {
-                MessageBox({
-                  title: "Error",
-                  message: err.message || `Failed to ${mssg}`,
-                  type: "error"
-                });
+                toast.error(err.message || `Failed to ${mssg}`);
             }finally{
                     setLoading(false);
                 }
@@ -69,6 +63,7 @@ export default function MembersPage(){
 
     return(
         <div className="page-container page-container--narrow">
+            <ToastContainer position="top-right" autoClose={4000} />
             <div className="page-header">
                 <h1 className="page-title">Members</h1>
                 {isAdmin && (
