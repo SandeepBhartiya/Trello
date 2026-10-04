@@ -150,7 +150,6 @@ export default function IssueDetailPage(){
           setLoading(true);
           try {
               await deleteIssue(Number(issueId));
-              setIssue((prev:any)=>prev.filter((issue:any)=>issue.id!==Number(issueId)));
               toast.success("Issue deleted successfully");
               navigate(-1);
             } catch (err: any) {
