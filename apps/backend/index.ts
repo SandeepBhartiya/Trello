@@ -17,16 +17,6 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
-app.use(express.json())
-
-app.use("/",loginRoutes);
-app.use("/organization",organizationRoutes);
-app.use("/",membershipRoutes);
-app.use("/board",boardRoutes);
-app.use("/section",sectionRoutes);
-app.use("/issue",issueRoutes);
-app.use("/comment",commentRoutes);
-
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
@@ -40,5 +30,15 @@ app.use(cors({
   },
   credentials: true
 }));
+
+app.use(express.json())
+
+app.use("/",loginRoutes);
+app.use("/organization",organizationRoutes);
+app.use("/",membershipRoutes);
+app.use("/board",boardRoutes);
+app.use("/section",sectionRoutes);
+app.use("/issue",issueRoutes);
+app.use("/comment",commentRoutes);
 
 app.listen(3000,()=>console.log("Backend server started on port 3000"));
