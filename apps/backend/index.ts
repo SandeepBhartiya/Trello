@@ -11,10 +11,12 @@ import commentRoutes from "./routes/comment";
 dotenv.config({path:__dirname+"/.env"});
 const app=express();
 
-app.use(cors({
-    origin:process.env.FRONTEND_URL||"http://localhost:5173",
-    credentials:true
-}));
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://trello-csvu.vercel.app',
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
 app.use(express.json())
 
 app.use("/",loginRoutes);
@@ -24,5 +26,19 @@ app.use("/board",boardRoutes);
 app.use("/section",sectionRoutes);
 app.use("/issue",issueRoutes);
 app.use("/comment",commentRoutes);
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (
+      allowedOrigins.includes(origin) ||
+      /\.vercel\.app$/.test(origin)
+    ) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true
+}));
 
 app.listen(3000,()=>console.log("Backend server started on port 3000"));
