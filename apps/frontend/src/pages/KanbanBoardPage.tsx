@@ -22,7 +22,7 @@ import "../styles/kanban.css";
 export default function KanbanBoardPage(){
     const [sections,setSections]=useState<Section[]>([]);
     const [issues,setIssues]=useState<Issue[]>([]);
-    const {loading,setLoading}=useLoading();
+    const {setLoading}=useLoading();
     const [addingSection,setAddingSection]=useState(false);
     const [newSectionTitle,setNewSectionTitle]=useState("");
     const [activeIssue,setActiveIssue]=useState<Issue|null>(null);

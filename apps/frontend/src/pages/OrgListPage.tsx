@@ -12,7 +12,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 export default function OrgListPage() {
   const [orgs, setOrgs] = useState<Org[]>([]);
-  const {loading, setLoading} = useLoading();
+  const {setLoading} = useLoading();
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   const navigate = useNavigate();

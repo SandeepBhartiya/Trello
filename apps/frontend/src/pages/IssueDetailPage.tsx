@@ -21,7 +21,7 @@ export default function IssueDetailPage(){
 
     const [issue,setIssue]=useState<Issue>();
     const [comments,setComments]=useState<Comment[]>([]);
-    const {loading,setLoading}=useLoading();
+    const {setLoading}=useLoading();
 
     const [title,setTitle]=useState("");
     const [description,setDescription]=useState("");

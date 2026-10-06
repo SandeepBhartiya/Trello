@@ -17,7 +17,7 @@ export default function MembersPage(){
     const id=Number(orgId);
     const {user,token}=useAuth();
     const [members,setMembers]=useState<Membership[]>([]);
-    const {loading,setLoading}=useLoading();
+    const {setLoading}=useLoading();
     const [showInviteModal,setShowInviteModal]=useState(false);
     const [userId,setUserId]=useState<number>();
     

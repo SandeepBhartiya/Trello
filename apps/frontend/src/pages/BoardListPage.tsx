@@ -15,7 +15,7 @@ export default function BoardListPage(){
     const organizationId=Number(orgId);
     const [boards,setBoards]=useState<Board[]>([]);
     const [selectedBoard,setSelectedBoard]=useState<Board|null>(null);
-    const {loading,setLoading}=useLoading();
+    const {setLoading}=useLoading();
     const [showCreateModal,setShowCreateModal]=useState(false);
     const [showRenameModal,setShowRenameModal]=useState(false);
     const [userRole,setUserRole]=useState("");

@@ -22,7 +22,7 @@ export default function SectionColumn({section,issues,onAddIssue,onIssueClick,on
     const [adding,setAdding]=useState(false);
     const [editingTitle,setEditingTitle]=useState(false);
     const [title,setTitle]=useState(section.title);
-    const {loading,setLoading}=useLoading();
+    const {setLoading}=useLoading();
     const isSynthetic = section.id === -1;
 
     const {setNodeRef,isOver}=useDroppable({
